@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cronograma de trabajo — CVAT</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.44.0/iconfont/tabler-icons.min.css">
+<style>
+  :root{
+    --bg: #FAF9F6;
+    --surface: #FFFFFF;
+    --surface-2: #F1EFE8;
+    --border: rgba(44,44,42,0.12);
+    --border-strong: rgba(44,44,42,0.25);
+    --text-primary: #1F1E1B;
+    --text-secondary: #5F5E5A;
+    --text-tertiary: #888780;
+    --info-bg: #E6F1FB;
+    --info-text: #0C447C;
+    --success-bg: #EAF3DE;
+    --success-text: #27500A;
+    --warning-bg: #FAEEDA;
+    --warning-text: #633806;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg: #1A1A18;
+      --surface: #232220;
+      --surface-2: #2C2C2A;
+      --border: rgba(255,255,255,0.12);
+      --border-strong: rgba(255,255,255,0.22);
+      --text-primary: #F1EFE8;
+      --text-secondary: #B4B2A9;
+      --text-tertiary: #888780;
+      --info-bg: #0C447C;
+      --info-text: #B5D4F4;
+      --success-bg: #27500A;
+      --success-text: #C0DD97;
+      --warning-bg: #633806;
+      --warning-text: #FAC775;
+    }
+  }
+  *{ box-sizing: border-box; }
+  body{
+    margin:0;
+    font-family: var(--font-sans);
+    background: var(--bg);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap{ max-width: 720px; margin: 0 auto; padding: 32px 20px 64px; }
+  h1{ font-size: 20px; font-weight: 500; margin: 0 0 4px; }
+  .subtitle{ font-size: 14px; color: var(--text-secondary); margin: 0 0 24px; }
+
+  .tabs{ display:flex; gap:8px; margin-bottom:20px; border-bottom:1px solid var(--border); }
+  .tab-btn{ border:none; background:none; padding:10px 4px; font-size:14px; font-weight:500; color:var(--text-tertiary); border-bottom:2px solid transparent; cursor:pointer; font-family:inherit; }
+  .tab-btn.active{ color:var(--text-primary); border-bottom-color: var(--text-primary); }
+
+  .panel{ display:none; }
+  .panel.active{ display:block; }
+
+  .stat-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); gap:12px; margin-bottom:24px; }
+  .stat-card{ background:var(--surface-2); border-radius:var(--radius-md); padding:16px; }
+  .stat-label{ font-size:13px; color:var(--text-secondary); margin:0 0 4px; }
+  .stat-value{ font-size:24px; font-weight:500; margin:0; }
+
+  .jobs-list{ display:flex; flex-direction:column; gap:10px; }
+  .job-card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:14px 16px; }
+  .job-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:10px; }
+  .job-id{ font-size:15px; font-weight:500; }
+  .badge{ margin-left:8px; font-size:12px; padding:3px 8px; border-radius:var(--radius-md); background:var(--surface-2); color:var(--text-secondary); }
+  .badge-info{ background:var(--info-bg); color:var(--info-text); }
+  .badge-success{ background:var(--success-bg); color:var(--success-text); }
+  .badge-warning{ background:var(--warning-bg); color:var(--warning-text); }
+  .del-btn{ border:none; background:none; padding:4px; color:var(--text-tertiary); cursor:pointer; font-size:16px; }
+  .del-btn:hover{ color:var(--text-primary); }
+  .dots-row{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:8px; }
+  .dot{ width:9px; height:9px; border-radius:50%; display:inline-block; margin-right:4px; border:1px solid var(--border-strong); }
+  .dot.filled{ background:#0C447C; border-color:#0C447C; }
+  @media (prefers-color-scheme: dark){ .dot.filled{ background:#85B7EB; border-color:#85B7EB; } }
+  .meta-row{ display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--text-secondary); flex-wrap:wrap; gap:6px; }
+  .revision-line{ margin-top:6px; font-size:12px; color:var(--text-secondary); }
+  .empty-state{ font-size:14px; color:var(--text-tertiary); text-align:center; padding:48px 0; }
+
+  label.field-label{ font-size:13px; color:var(--text-secondary); display:block; margin-bottom:4px; }
+  input, select{
+    width:100%; height:36px; padding:0 10px; font-size:14px; font-family:inherit;
+    background:var(--surface); color:var(--text-primary);
+    border:1px solid var(--border); border-radius:var(--radius-md);
+  }
+  input:focus, select:focus{ outline:none; border-color: var(--border-strong); box-shadow: 0 0 0 3px rgba(12,68,124,0.15); }
+  .field-group{ margin-bottom:14px; }
+  .field-row{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+  button.action-btn{
+    border:1px solid var(--border-strong); background:var(--surface); color:var(--text-primary);
+    border-radius:var(--radius-md); padding:8px 20px; font-size:14px; font-family:inherit; cursor:pointer;
+    display:flex; align-items:center; gap:6px; justify-content:center;
+  }
+  button.action-btn:hover{ background:var(--surface-2); }
+  button.action-btn:active{ transform: scale(0.98); }
+  #add-job-btn{ margin-top:4px; }
+  #add-feedback{ font-size:13px; color:var(--success-text); display:none; margin:8px 0 0; }
+
+  .timer-wrap{ display:flex; flex-direction:column; align-items:center; padding:24px 0; }
+  #timer-job{ max-width:320px; margin-bottom:20px; }
+  .timer-phase{ font-size:13px; color:var(--text-secondary); margin-bottom:4px; }
+  .timer-display{ font-size:56px; font-weight:500; font-family:var(--font-mono); margin-bottom:24px; }
+  .timer-controls{ display:flex; gap:8px; margin-bottom:24px; }
+  .cycle-dots{ display:flex; gap:6px; flex-wrap:wrap; justify-content:center; max-width:400px; }
+  .cycle-dot{ width:10px; height:10px; border-radius:50%; border:1px solid var(--border-strong); }
+  .cycle-dot.filled{ background:#27500A; border-color:#27500A; }
+  @media (prefers-color-scheme: dark){ .cycle-dot.filled{ background:#C0DD97; border-color:#C0DD97; } }
+  .cycle-label{ font-size:13px; color:var(--text-secondary); margin-top:10px; }
+
+  .footer-note{ font-size:12px; color:var(--text-tertiary); margin-top:32px; text-align:center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Cronograma de trabajo</h1>
+  <p class="subtitle">Seguimiento de packs de labeling en CVAT y ciclos de 45/15</p>
+
+  <div class="tabs">
+    <button type="button" class="tab-btn active" data-tab="trabajos">Trabajos</button>
+    <button type="button" class="tab-btn" data-tab="timer">Cronómetro</button>
+    <button type="button" class="tab-btn" data-tab="nuevo">Agregar</button>
+  </div>
+
+  <div id="panel-trabajos" class="panel active">
+    <div class="stat-grid">
+      <div class="stat-card">
+        <p class="stat-label">Trabajos activos</p>
+        <p class="stat-value" id="stat-total">-</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-label">Frames en pack</p>
+        <p class="stat-value" id="stat-frames">-</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-label">Pagos pendientes</p>
+        <p class="stat-value" id="stat-pending">-</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-label">Horas totales</p>
+        <p class="stat-value" id="stat-hours">-</p>
+      </div>
+    </div>
+
+    <div id="jobs-list" class="jobs-list"></div>
+    <p id="empty-state" class="empty-state" style="display:none;">Todavía no hay trabajos cargados. Usá la pestaña Agregar para sumar el primero.</p>
+  </div>
+
+  <div id="panel-timer" class="panel">
+    <div class="timer-wrap">
+      <select id="timer-job">
+        <option value="">Sin trabajo asociado</option>
+      </select>
+
+      <div class="timer-phase" id="timer-phase-label">Foco</div>
+      <div class="timer-display" id="timer-display">45:00</div>
+
+      <div class="timer-controls">
+        <button type="button" class="action-btn" id="timer-toggle"><i class="ti ti-player-play"></i><span>Iniciar</span></button>
+        <button type="button" class="action-btn" id="timer-reset"><i class="ti ti-refresh"></i><span>Reiniciar</span></button>
+        <button type="button" class="action-btn" id="timer-skip"><i class="ti ti-player-skip-forward"></i><span>Saltar</span></button>
+      </div>
+
+      <div class="cycle-dots" id="cycle-dots"></div>
+      <p class="cycle-label" id="cycle-count-label">0 ciclos completados hoy</p>
+    </div>
+  </div>
+
+  <div id="panel-nuevo" class="panel">
+    <div class="field-group">
+      <label class="field-label">ID del trabajo</label>
+      <input type="text" id="new-id" placeholder="ej. 205">
+    </div>
+    <div class="field-row field-group">
+      <div>
+        <label class="field-label">Frames del pack</label>
+        <input type="number" id="new-frames" placeholder="200">
+      </div>
+      <div>
+        <label class="field-label">Horas estimadas</label>
+        <input type="number" step="0.1" id="new-hs" placeholder="4.5">
+      </div>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Etapa del pack</label>
+      <select id="new-stage">
+        <option value="annotation">Annotation</option>
+        <option value="validation">Validation</option>
+        <option value="acceptance">Acceptance</option>
+      </select>
+    </div>
+    <div class="field-row field-group">
+      <div>
+        <label class="field-label">Estado de pago</label>
+        <select id="new-pay">
+          <option value="waiting">Waiting</option>
+          <option value="complete">Complete</option>
+        </select>
+      </div>
+      <div>
+        <label class="field-label">Fecha fin de pack</label>
+        <input type="date" id="new-date">
+      </div>
+    </div>
+    <button type="button" class="action-btn" id="add-job-btn"><i class="ti ti-plus"></i><span>Agregar trabajo</span></button>
+    <p id="add-feedback">Trabajo agregado.</p>
+  </div>
+
+  <p class="footer-note">Los datos se guardan en este navegador (localStorage). No se sincronizan entre dispositivos.</p>
+</div>
+
+<script>
+(function(){
+  const STORAGE_KEY = 'cvat-jobs-v1';
+  const TIMER_KEY = 'cvat-timer-state-v1';
+  let jobs = [];
+
+  const seedJobs = [
+    {id:'22', stars:0, hs:6, status:'complete', pay:'complete', payDate:'21/5/26', dateFinish:'12/5/26', frames:200, stage:'acceptance', payId:'00000036', revisionFrames:null, dateRevision:null},
+    {id:'21', stars:0, hs:6, status:'complete', pay:'waiting', payDate:'-', dateFinish:'26/5/26', frames:200, stage:'acceptance', payId:null, revisionFrames:null, dateRevision:null},
+    {id:'73', stars:6, hs:4.5, status:'complete', pay:'waiting', payDate:'-', dateFinish:'04/6/26', frames:200, stage:'validation', payId:null, revisionFrames:null, dateRevision:null},
+    {id:'142', stars:7, hs:5.5, status:'complete', pay:'waiting', payDate:'-', dateFinish:'10/6/26', frames:200, stage:'annotation', payId:null, revisionFrames:129, dateRevision:'25/6/26'},
+    {id:'204', stars:1, hs:0.45, status:'complete', pay:'waiting', payDate:'-', dateFinish:'15/6/26', frames:23, stage:'annotation', payId:null, revisionFrames:null, dateRevision:null},
+    {id:'203', stars:6, hs:4.5, status:'complete', pay:'waiting', payDate:'-', dateFinish:'16/6/26', frames:200, stage:'annotation', payId:null, revisionFrames:null, dateRevision:null},
+    {id:'199', stars:6, hs:7, status:'complete', pay:'waiting', payDate:'-', dateFinish:'23/6/26', frames:200, stage:'annotation', payId:null, revisionFrames:null, dateRevision:null},
+  ];
+
+  const stageLabel = { annotation:'Annotation', validation:'Validation', acceptance:'Acceptance' };
+
+  function checkpointsFor(hs){ return Math.round((hs * 60) / 45); }
+
+  function loadJobs(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      jobs = raw ? JSON.parse(raw) : seedJobs.slice();
+      if(!raw) saveJobs();
+    }catch(e){
+      jobs = seedJobs.slice();
+    }
+    render();
+  }
+
+  function saveJobs(){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(jobs)); }catch(e){}
+  }
+
+  function render(){
+    const list = document.getElementById('jobs-list');
+    const empty = document.getElementById('empty-state');
+    list.innerHTML = '';
+    empty.style.display = jobs.length === 0 ? 'block' : 'none';
+
+    let totalFrames = 0, pending = 0, totalHs = 0;
+    jobs.forEach(j => {
+      totalFrames += Number(j.frames)||0;
+      totalHs += Number(j.hs)||0;
+      if(j.pay === 'waiting') pending++;
+    });
+    document.getElementById('stat-total').textContent = jobs.length;
+    document.getElementById('stat-frames').textContent = totalFrames.toLocaleString('es-AR');
+    document.getElementById('stat-pending').textContent = pending;
+    document.getElementById('stat-hours').textContent = (Math.round(totalHs*100)/100) + ' hs';
+
+    jobs.forEach((j, idx) => {
+      const cp = checkpointsFor(Number(j.hs)||0);
+      const done = Math.min(j.stars||0, cp);
+      const card = document.createElement('div');
+      card.className = 'job-card';
+
+      let dots = '';
+      for(let i=0;i<cp;i++){
+        dots += `<span class="dot ${i<done?'filled':''}"></span>`;
+      }
+
+      const payBadgeClass = j.pay === 'complete' ? 'badge-success' : 'badge-warning';
+      const revisionLine = j.revisionFrames
+        ? `<div class="revision-line"><i class="ti ti-history"></i> revisión: ${j.revisionFrames} frames · ${j.dateRevision||''}</div>`
+        : '';
+
+      card.innerHTML = `
+        <div class="job-head">
+          <div>
+            <span class="job-id">Id ${j.id}</span>
+            <span class="badge">${j.frames} frames</span>
+            <span class="badge badge-info">${stageLabel[j.stage]||j.stage}</span>
+          </div>
+          <button type="button" class="del-btn" data-idx="${idx}" aria-label="Eliminar trabajo"><i class="ti ti-trash"></i></button>
+        </div>
+        <div class="dots-row">
+          <div>${dots}</div>
+          <span style="font-size:12px; color:var(--text-tertiary);">${done}/${cp} checkpoints · ${j.hs} hs</span>
+        </div>
+        <div class="meta-row">
+          <span><i class="ti ti-calendar"></i> entrega ${j.dateFinish}</span>
+          <span class="badge ${payBadgeClass}">pago ${j.pay}${j.payId ? ' · '+j.payId : ''}</span>
+        </div>
+        ${revisionLine}
+      `;
+      list.appendChild(card);
+    });
+
+    document.querySelectorAll('.del-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const idx = Number(e.currentTarget.dataset.idx);
+        jobs.splice(idx, 1);
+        saveJobs();
+        render();
+        populateTimerSelect();
+      });
+    });
+
+    populateTimerSelect();
+  }
+
+  function populateTimerSelect(){
+    const sel = document.getElementById('timer-job');
+    const current = sel.value;
+    sel.innerHTML = '<option value="">Sin trabajo asociado</option>';
+    jobs.forEach(j => {
+      const opt = document.createElement('option');
+      opt.value = j.id;
+      opt.textContent = `Id ${j.id} (${j.frames} frames)`;
+      sel.appendChild(opt);
+    });
+    if(jobs.some(j=>j.id===current)) sel.value = current;
+  }
+
+  // Tabs
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  // Add job form
+  document.getElementById('add-job-btn').addEventListener('click', () => {
+    const id = document.getElementById('new-id').value.trim();
+    if(!id) return;
+    const frames = Number(document.getElementById('new-frames').value) || 0;
+    const hs = Number(document.getElementById('new-hs').value) || 0;
+    const stage = document.getElementById('new-stage').value;
+    const pay = document.getElementById('new-pay').value;
+    const dateRaw = document.getElementById('new-date').value;
+    let dateFinish = '-';
+    if(dateRaw){
+      const [y,m,d] = dateRaw.split('-');
+      dateFinish = `${d}/${Number(m)}/${y.slice(2)}`;
+    }
+    jobs.push({id, stars:0, hs, status:'complete', pay, payDate: pay==='complete'?dateFinish:'-', dateFinish, frames, stage, payId:null, revisionFrames:null, dateRevision:null});
+    saveJobs();
+    render();
+    document.getElementById('new-id').value='';
+    document.getElementById('new-frames').value='';
+    document.getElementById('new-hs').value='';
+    document.getElementById('new-date').value='';
+    const fb = document.getElementById('add-feedback');
+    fb.style.display='block';
+    setTimeout(()=>{ fb.style.display='none'; }, 2000);
+  });
+
+  // Timer
+  const FOCUS_SEC = 45*60;
+  const BREAK_SEC = 15*60;
+  let timerState = { phase:'focus', remaining: FOCUS_SEC, running:false, cyclesToday:0 };
+  let intervalHandle = null;
+
+  function formatTime(sec){
+    const m = Math.floor(sec/60);
+    const s = sec%60;
+    return String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  }
+
+  function renderTimer(){
+    document.getElementById('timer-display').textContent = formatTime(timerState.remaining);
+    document.getElementById('timer-phase-label').textContent = timerState.phase === 'focus' ? 'Foco (45 min)' : 'Descanso (15 min)';
+    const toggleBtn = document.getElementById('timer-toggle');
+    toggleBtn.innerHTML = timerState.running
+      ? '<i class="ti ti-player-pause"></i><span>Pausar</span>'
+      : '<i class="ti ti-player-play"></i><span>Iniciar</span>';
+
+    const dotsWrap = document.getElementById('cycle-dots');
+    dotsWrap.innerHTML = '';
+    const totalDots = Math.max(timerState.cyclesToday, 4);
+    for(let i=0;i<totalDots;i++){
+      const d = document.createElement('span');
+      d.className = 'cycle-dot' + (i < timerState.cyclesToday ? ' filled' : '');
+      dotsWrap.appendChild(d);
+    }
+    document.getElementById('cycle-count-label').textContent =
+      timerState.cyclesToday + (timerState.cyclesToday===1 ? ' ciclo completado hoy' : ' ciclos completados hoy');
+  }
+
+  function saveTimerState(){
+    try{ localStorage.setItem(TIMER_KEY, JSON.stringify({cyclesToday: timerState.cyclesToday})); }catch(e){}
+  }
+
+  function loadTimerState(){
+    try{
+      const raw = localStorage.getItem(TIMER_KEY);
+      if(raw){
+        const parsed = JSON.parse(raw);
+        timerState.cyclesToday = parsed.cyclesToday || 0;
+      }
+    }catch(e){}
+    renderTimer();
+  }
+
+  function tick(){
+    if(timerState.remaining > 0){
+      timerState.remaining--;
+    } else {
+      if(timerState.phase === 'focus'){
+        timerState.cyclesToday++;
+        timerState.phase = 'break';
+        timerState.remaining = BREAK_SEC;
+        saveTimerState();
+        const jobId = document.getElementById('timer-job').value;
+        if(jobId){
+          const job = jobs.find(j => j.id === jobId);
+          if(job){
+            const cp = checkpointsFor(Number(job.hs)||0);
+            job.stars = Math.min((job.stars||0) + 1, cp);
+            saveJobs();
+            render();
+          }
+        }
+      } else {
+        timerState.phase = 'focus';
+        timerState.remaining = FOCUS_SEC;
+      }
+    }
+    renderTimer();
+  }
+
+  document.getElementById('timer-toggle').addEventListener('click', () => {
+    timerState.running = !timerState.running;
+    if(timerState.running){
+      intervalHandle = setInterval(tick, 1000);
+    } else {
+      clearInterval(intervalHandle);
+    }
+    renderTimer();
+  });
+
+  document.getElementById('timer-reset').addEventListener('click', () => {
+    clearInterval(intervalHandle);
+    timerState.running = false;
+    timerState.phase = 'focus';
+    timerState.remaining = FOCUS_SEC;
+    renderTimer();
+  });
+
+  document.getElementById('timer-skip').addEventListener('click', () => {
+    timerState.remaining = 0;
+    tick();
+  });
+
+  loadJobs();
+  loadTimerState();
+})();
+</script>
+</body>
+</html>
