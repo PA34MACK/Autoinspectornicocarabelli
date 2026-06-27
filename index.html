@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cronograma de trabajo — CVAT</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.44.0/iconfont/tabler-icons.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/dist/tabler-icons.min.css">
 <style>
   :root{
     --bg: #FAF9F6;
@@ -21,6 +21,14 @@
     --success-text: #27500A;
     --warning-bg: #FAEEDA;
     --warning-text: #633806;
+    --magenta-bg: #F5C9E3;
+    --magenta-text: #7A1158;
+    --maroon-bg: #E3B3B0;
+    --maroon-text: #5C1212;
+    --pay-bg: #D7F0DC;
+    --pay-text: #0E6B2E;
+    --owes-bg: #FBDADA;
+    --owes-text: #B3261E;
     --radius-md: 8px;
     --radius-lg: 12px;
     --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -42,6 +50,14 @@
       --success-text: #C0DD97;
       --warning-bg: #633806;
       --warning-text: #FAC775;
+      --magenta-bg: #6E1A52;
+      --magenta-text: #F6BEE2;
+      --maroon-bg: #5C1010;
+      --maroon-text: #F3B8B8;
+      --pay-bg: #0E6B2E;
+      --pay-text: #B7E8C4;
+      --owes-bg: #6B1A16;
+      --owes-text: #F7B8B5;
     }
   }
   *{ box-sizing: border-box; }
@@ -65,6 +81,31 @@
 
   .stat-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); gap:12px; margin-bottom:24px; }
   .stat-card{ background:var(--surface-2); border-radius:var(--radius-md); padding:16px; }
+
+  .jobs-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+  .jobs-header-title{ font-size:16px; font-weight:500; margin:0; }
+  .filter-btn{ position:relative; border:1px solid var(--border); background:var(--surface); color:var(--text-secondary); border-radius:var(--radius-md); padding:7px 11px; cursor:pointer; display:flex; align-items:center; font-size:15px; }
+  .filter-btn:hover{ color:var(--text-primary); background:var(--surface-2); }
+  .filter-btn.active{ color:var(--info-text); border-color:var(--info-text); }
+  .filter-count-badge{ position:absolute; top:-6px; right:-6px; background:var(--info-text); color:#fff; font-size:11px; line-height:1; border-radius:999px; min-width:16px; height:16px; display:flex; align-items:center; justify-content:center; padding:0 4px; }
+
+  .filter-panel{ background:var(--surface-2); border-radius:var(--radius-md); padding:14px 16px; margin-bottom:16px; display:flex; flex-wrap:wrap; gap:20px; align-items:flex-start; }
+  .filter-panel.hidden{ display:none; }
+  .filter-group{ display:flex; flex-direction:column; gap:8px; }
+  .filter-group-label{ font-size:12px; color:var(--text-tertiary); margin:0; text-transform:uppercase; letter-spacing:0.04em; }
+  .filter-pill-row{ display:flex; gap:8px; }
+  .filter-pill{
+    font-size:13px; font-weight:500; padding:6px 16px; border-radius:999px;
+    border:1.5px solid var(--border-strong); background:var(--surface); color:var(--text-secondary);
+    cursor:pointer; transition:background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .filter-pill:hover{ border-color:var(--text-tertiary); }
+  .filter-pill-lebelling.active{ background:var(--magenta-bg); color:var(--magenta-text); border-color:var(--magenta-text); }
+  .filter-pill-reviewer.active{ background:var(--maroon-bg); color:var(--maroon-text); border-color:var(--maroon-text); }
+  .filter-pill-pay.active{ background:var(--pay-bg); color:var(--pay-text); border-color:var(--pay-text); }
+  .filter-pill-owes.active{ background:var(--owes-bg); color:var(--owes-text); border-color:var(--owes-text); }
+  .filter-clear-btn{ border:none; background:none; color:var(--text-tertiary); font-size:13px; cursor:pointer; text-decoration:underline; align-self:flex-end; margin-left:auto; }
+  .filter-clear-btn:hover{ color:var(--text-primary); }
   .stat-label{ font-size:13px; color:var(--text-secondary); margin:0 0 4px; }
   .stat-value{ font-size:24px; font-weight:500; margin:0; }
 
@@ -76,8 +117,17 @@
   .badge-info{ background:var(--info-bg); color:var(--info-text); }
   .badge-success{ background:var(--success-bg); color:var(--success-text); }
   .badge-warning{ background:var(--warning-bg); color:var(--warning-text); }
-  .del-btn{ border:none; background:none; padding:4px; color:var(--text-tertiary); cursor:pointer; font-size:16px; }
-  .del-btn:hover{ color:var(--text-primary); }
+  .badge-pay{ background:var(--pay-bg); color:var(--pay-text); font-weight:600; }
+  .badge-owes{ background:var(--owes-bg); color:var(--owes-text); font-weight:600; }
+  .job-actions{ display:flex; align-items:center; gap:2px; flex-shrink:0; }
+  .icon-btn{ border:none; background:none; padding:4px 6px; color:var(--text-tertiary); cursor:pointer; font-size:16px; display:flex; align-items:center; gap:4px; }
+  .icon-btn:hover{ color:var(--text-primary); }
+  .icon-fallback{ font-size:13px; display:none; font-family:initial; }
+  body.icons-unavailable .icon-fallback{ display:inline; }
+  body.icons-unavailable .ti{ display:none; }
+  .del-btn:hover{ color:#b3261e; }
+  .role-row{ display:flex; gap:8px; margin-bottom:8px; }
+  .mini-select{ flex:1; height:30px; font-size:12px; padding:0 6px; }
   .dots-row{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:8px; }
   .dot{ width:9px; height:9px; border-radius:50%; display:inline-block; margin-right:4px; border:1px solid var(--border-strong); }
   .dot.filled{ background:#0C447C; border-color:#0C447C; }
@@ -118,12 +168,104 @@
   .cycle-label{ font-size:13px; color:var(--text-secondary); margin-top:10px; }
 
   .footer-note{ font-size:12px; color:var(--text-tertiary); margin-top:32px; text-align:center; }
+
+  .badge-type-first{ background:var(--info-bg); color:var(--info-text); }
+  .badge-type-correction{ background:var(--warning-bg); color:var(--warning-text); }
+
+  .pill-row{ display:flex; gap:8px; margin-bottom:8px; flex-wrap:wrap; }
+  .pill{ font-size:12px; font-weight:500; padding:4px 12px; border-radius:999px; line-height:1.4; }
+  .pill-role-lebelling{ background:var(--magenta-bg); color:var(--magenta-text); }
+  .pill-role-reviewer{ background:var(--maroon-bg); color:var(--maroon-text); }
+  .pill-type-first{ background:var(--info-bg); color:var(--info-text); }
+  .pill-type-correction{ background:var(--warning-bg); color:var(--warning-text); }
+
+  .backup-section{ margin-top:28px; padding-top:18px; border-top:1px solid var(--border); }
+  .backup-title{ font-size:13px; color:var(--text-secondary); margin:0 0 10px; }
+  .backup-row{ display:flex; gap:8px; flex-wrap:wrap; }
+  .backup-row .action-btn{ flex:1; min-width:160px; }
+  .backup-feedback{ font-size:13px; color:var(--success-text); margin:8px 0 0; display:none; }
+
+  .modal-overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.45); display:flex; align-items:center; justify-content:center; padding:20px; z-index:50; }
+  .modal-overlay.hidden{ display:none; }
+  .modal-box{ background:var(--surface); border-radius:var(--radius-lg); padding:20px; max-width:420px; width:100%; max-height:88vh; overflow-y:auto; }
+  .modal-title{ font-size:16px; font-weight:500; margin:0 0 16px; }
+  .modal-actions{ display:flex; gap:8px; margin-top:18px; }
+  .modal-actions .action-btn{ flex:1; }
+  .action-btn.primary{ background:var(--info-text); color:#fff; border-color:var(--info-text); }
+  .action-btn.primary:hover{ opacity:0.9; background:var(--info-text); }
+  .action-btn.success{ background:#27500A; color:#fff; border-color:#27500A; }
+  .action-btn.success:hover{ opacity:0.9; background:#27500A; }
+  .timer-extra-row{ display:flex; gap:10px; max-width:320px; width:100%; margin-top:10px; }
+  .timer-extra-row > div{ flex:1; }
+  .timer-finish-row{ margin-top:14px; }
+
+  .slide-section{
+    margin-top:28px; border-top:1px solid var(--border); padding-top:16px;
+    width:100vw; max-width:980px;
+    margin-left:50%; transform:translateX(-50%);
+  }
+  @media (max-width:760px){
+    .slide-section{ width:100%; max-width:none; margin-left:0; transform:none; padding-left:20px; padding-right:20px; box-sizing:border-box; }
+  }
+  .slide-header{ display:flex; align-items:center; justify-content:space-between; cursor:pointer; user-select:none; }
+  .slide-header h3{ font-size:14px; font-weight:500; margin:0; display:flex; align-items:center; gap:6px; }
+  .slide-chevron{ transition:transform 0.2s ease; color:var(--text-tertiary); }
+  .slide-section.collapsed .slide-chevron{ transform:rotate(-90deg); }
+  .slide-chevron-fallback{ display:none; transition:transform 0.2s ease; }
+  body.icons-unavailable .slide-chevron-fallback{ display:inline-block; }
+  .slide-section.collapsed .slide-chevron-fallback{ transform:rotate(-90deg); }
+  .slide-body{ margin-top:14px; }
+  .slide-section.collapsed .slide-body{ display:none; }
+  .slide-add-btn{ border:1px dashed var(--border-strong); background:none; color:var(--text-secondary); border-radius:var(--radius-md); padding:6px 12px; font-size:13px; cursor:pointer; display:flex; align-items:center; gap:6px; margin-top:12px; width:100%; justify-content:center; }
+  .slide-add-btn:hover{ background:var(--surface-2); color:var(--text-primary); }
+
+  .notes-grid{ display:grid; grid-template-columns:repeat(2, 1fr); gap:14px; }
+  @media (max-width:760px){ .notes-grid{ grid-template-columns:1fr; } }
+
+  .note-card{
+    background:var(--surface);
+    border-radius:14px;
+    box-shadow:0 1px 2px rgba(0,0,0,0.06), 0 4px 10px rgba(0,0,0,0.07);
+    border:1px solid var(--border);
+    overflow:hidden;
+    display:flex;
+    flex-direction:row;
+    align-items:stretch;
+    min-height:64px;
+    transition:box-shadow 0.15s ease, transform 0.15s ease;
+  }
+  .note-card:hover{ box-shadow:0 2px 4px rgba(0,0,0,0.08), 0 8px 16px rgba(0,0,0,0.1); transform:translateY(-1px); }
+  @media (prefers-color-scheme: dark){
+    .note-card{ box-shadow:0 1px 2px rgba(0,0,0,0.3), 0 4px 12px rgba(0,0,0,0.35); }
+    .note-card:hover{ box-shadow:0 2px 6px rgba(0,0,0,0.4), 0 10px 20px rgba(0,0,0,0.45); }
+  }
+  .note-card-bar{
+    width:6px;
+    flex-shrink:0;
+    background:linear-gradient(to bottom, rgba(0,0,0,0.10), rgba(0,0,0,0.03));
+  }
+  @media (prefers-color-scheme: dark){
+    .note-card-bar{ background:linear-gradient(to bottom, rgba(255,255,255,0.14), rgba(255,255,255,0.04)); }
+  }
+  .note-card-body{ padding:14px 16px; flex:1; display:flex; align-items:center; min-width:0; }
+  .note-card-text{ font-size:14px; line-height:1.5; color:var(--text-primary); white-space:pre-wrap; word-break:break-word; margin:0; }
+  .note-card-footer{
+    display:flex; flex-direction:column; justify-content:center; gap:4px;
+    padding:8px 10px; border-left:1px solid var(--border); background:var(--surface-2); flex-shrink:0;
+  }
+  .note-card-footer .icon-btn{ font-size:19px; padding:6px; }
+  .note-card-empty{
+    grid-column:1 / -1;
+    font-size:13px; color:var(--text-tertiary); text-align:center;
+    padding:24px 12px; border:1px dashed var(--border-strong); border-radius:14px;
+  }
+  .copy-feedback-toast{ font-size:12px; color:var(--success-text); padding:0 0 0 16px; margin:0; display:none; align-self:flex-start; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>Cronograma de trabajo</h1>
-  <p class="subtitle">Seguimiento de packs de labeling en CVAT y ciclos de 45/15</p>
+  <p class="subtitle">Seguimiento de packs CVATS y ciclos de 45/15</p>
 
   <div class="tabs">
     <button type="button" class="tab-btn active" data-tab="trabajos">Trabajos</button>
@@ -132,6 +274,32 @@
   </div>
 
   <div id="panel-trabajos" class="panel active">
+    <div class="jobs-header">
+      <h2 class="jobs-header-title">Trabajos</h2>
+      <button type="button" class="filter-btn" id="filter-toggle-btn" aria-label="Filtrar">
+        <i class="ti ti-filter"></i><span class="icon-fallback">⚙</span>
+        <span id="filter-count-badge" class="filter-count-badge" style="display:none;">0</span>
+      </button>
+    </div>
+
+    <div id="filter-panel" class="filter-panel hidden">
+      <div class="filter-group">
+        <p class="filter-group-label">Rol</p>
+        <div class="filter-pill-row">
+          <button type="button" class="filter-pill filter-pill-lebelling" id="filter-role-lebelling" data-group="role" data-value="lebelling">Lebelling</button>
+          <button type="button" class="filter-pill filter-pill-reviewer" id="filter-role-reviewer" data-group="role" data-value="reviewer">Reviewer</button>
+        </div>
+      </div>
+      <div class="filter-group">
+        <p class="filter-group-label">Estado</p>
+        <div class="filter-pill-row">
+          <button type="button" class="filter-pill filter-pill-pay" id="filter-pay-pay" data-group="pay" data-value="complete">Pay</button>
+          <button type="button" class="filter-pill filter-pill-owes" id="filter-pay-owes" data-group="pay" data-value="waiting">Owes</button>
+        </div>
+      </div>
+      <button type="button" class="filter-clear-btn" id="filter-clear-btn">Limpiar filtros</button>
+    </div>
+
     <div class="stat-grid">
       <div class="stat-card">
         <p class="stat-label">Trabajos activos</p>
@@ -142,7 +310,7 @@
         <p class="stat-value" id="stat-frames">-</p>
       </div>
       <div class="stat-card">
-        <p class="stat-label">Pagos pendientes</p>
+        <p class="stat-label">Owes</p>
         <p class="stat-value" id="stat-pending">-</p>
       </div>
       <div class="stat-card">
@@ -153,6 +321,7 @@
 
     <div id="jobs-list" class="jobs-list"></div>
     <p id="empty-state" class="empty-state" style="display:none;">Todavía no hay trabajos cargados. Usá la pestaña Agregar para sumar el primero.</p>
+    <p id="empty-filter-state" class="empty-state" style="display:none;">Ningún trabajo coincide con los filtros elegidos.</p>
   </div>
 
   <div id="panel-timer" class="panel">
@@ -161,7 +330,17 @@
         <option value="">Sin trabajo asociado</option>
       </select>
 
-      <div class="timer-phase" id="timer-phase-label">Foco</div>
+      <div class="timer-extra-row">
+        <div>
+          <label class="field-label">Tipo de tarea</label>
+          <select id="timer-type">
+            <option value="first">Firts annotation</option>
+            <option value="correction">Corrección</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="timer-phase" id="timer-phase-label" style="margin-top:18px;">Foco</div>
       <div class="timer-display" id="timer-display">45:00</div>
 
       <div class="timer-controls">
@@ -170,8 +349,60 @@
         <button type="button" class="action-btn" id="timer-skip"><i class="ti ti-player-skip-forward"></i><span>Saltar</span></button>
       </div>
 
-      <div class="cycle-dots" id="cycle-dots"></div>
-      <p class="cycle-label" id="cycle-count-label">0 ciclos completados hoy</p>
+      <div class="timer-finish-row">
+        <button type="button" class="action-btn success" id="timer-finish"><i class="ti ti-check"></i><span>Finish</span></button>
+      </div>
+
+      <div class="cycle-dots" id="cycle-dots" style="margin-top:24px;"></div>
+      <p class="cycle-label" id="cycle-count-label">Elegí un trabajo para ver sus ciclos</p>
+    </div>
+
+    <div class="slide-section" id="snippets-section">
+      <div class="slide-header" id="snippets-toggle">
+        <h3><i class="ti ti-chevron-down slide-chevron"></i><span class="icon-fallback slide-chevron-fallback">▾</span> Atajos issue reviewer</h3>
+      </div>
+      <div class="slide-body">
+        <div class="notes-grid" id="snippets-list"></div>
+        <button type="button" class="slide-add-btn" id="snippet-add-btn"><i class="ti ti-plus"></i><span>Agregar texto</span></button>
+      </div>
+    </div>
+
+    <div class="slide-section" id="feedbacks-section">
+      <div class="slide-header" id="feedbacks-toggle">
+        <h3><i class="ti ti-chevron-down slide-chevron"></i><span class="icon-fallback slide-chevron-fallback">▾</span> Feedbacks to take care</h3>
+      </div>
+      <div class="slide-body">
+        <div class="notes-grid" id="feedbacks-list"></div>
+        <button type="button" class="slide-add-btn" id="feedback-add-btn"><i class="ti ti-plus"></i><span>Agregar item</span></button>
+      </div>
+    </div>
+  </div>
+
+  <div id="snippet-modal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <p class="modal-title" id="snippet-modal-title">Agregar atajo</p>
+      <div class="field-group">
+        <label class="field-label">Texto</label>
+        <textarea id="snippet-text-input" rows="5" style="width:100%; font-family:inherit; font-size:14px; padding:10px; border-radius:var(--radius-md); border:1px solid var(--border); background:var(--surface); color:var(--text-primary);" placeholder="Texto del atajo para copiar y pegar..."></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="action-btn" id="snippet-cancel-btn">Cancelar</button>
+        <button type="button" class="action-btn primary" id="snippet-save-btn">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="feedback-modal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <p class="modal-title" id="feedback-modal-title">Agregar feedback</p>
+      <div class="field-group">
+        <label class="field-label">Texto</label>
+        <textarea id="feedback-text-input" rows="4" style="width:100%; font-family:inherit; font-size:14px; padding:10px; border-radius:var(--radius-md); border:1px solid var(--border); background:var(--surface); color:var(--text-primary);" placeholder="Feedback a tener en cuenta..."></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="action-btn" id="feedback-cancel-btn">Cancelar</button>
+        <button type="button" class="action-btn primary" id="feedback-save-btn">Guardar</button>
+      </div>
     </div>
   </div>
 
@@ -186,28 +417,24 @@
         <input type="number" id="new-frames" placeholder="200">
       </div>
       <div>
-        <label class="field-label">Horas estimadas</label>
-        <input type="number" step="0.1" id="new-hs" placeholder="4.5">
+        <label class="field-label">Rol</label>
+        <select id="new-role">
+          <option value="lebelling">Lebelling</option>
+          <option value="reviewer">Reviewer</option>
+        </select>
       </div>
-    </div>
-    <div class="field-group">
-      <label class="field-label">Etapa del pack</label>
-      <select id="new-stage">
-        <option value="annotation">Annotation</option>
-        <option value="validation">Validation</option>
-        <option value="acceptance">Acceptance</option>
-      </select>
     </div>
     <div class="field-row field-group">
       <div>
-        <label class="field-label">Estado de pago</label>
-        <select id="new-pay">
-          <option value="waiting">Waiting</option>
-          <option value="complete">Complete</option>
+        <label class="field-label">Etapa del pack</label>
+        <select id="new-stage">
+          <option value="annotation">Annotation</option>
+          <option value="validation">Validation</option>
+          <option value="acceptance">Acceptance</option>
         </select>
       </div>
       <div>
-        <label class="field-label">Fecha fin de pack</label>
+        <label class="field-label">Fecha de inicio</label>
         <input type="date" id="new-date">
       </div>
     </div>
@@ -216,6 +443,87 @@
   </div>
 
   <p class="footer-note">Los datos se guardan en este navegador (localStorage). No se sincronizan entre dispositivos.</p>
+
+  <div class="backup-section">
+    <p class="backup-title">Respaldo de datos</p>
+    <div class="backup-row">
+      <button type="button" class="action-btn" id="export-btn"><i class="ti ti-download"></i><span>Exportar respaldo (.json)</span></button>
+      <button type="button" class="action-btn" id="import-btn"><i class="ti ti-upload"></i><span>Importar respaldo (.json)</span></button>
+      <input type="file" id="import-file" accept="application/json" style="display:none;">
+    </div>
+    <p id="backup-feedback" class="backup-feedback">Listo.</p>
+  </div>
+</div>
+
+<div id="edit-modal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <p class="modal-title">Editar trabajo</p>
+    <div class="field-group">
+      <label class="field-label">ID del trabajo</label>
+      <input type="text" id="edit-id">
+    </div>
+    <div class="field-row field-group">
+      <div>
+        <label class="field-label">Frames del pack</label>
+        <input type="number" id="edit-frames">
+      </div>
+      <div>
+        <label class="field-label">Horas estimadas</label>
+        <input type="number" step="0.1" id="edit-hs">
+      </div>
+    </div>
+    <div class="field-row field-group">
+      <div>
+        <label class="field-label">Rol</label>
+        <select id="edit-role">
+          <option value="lebelling">Lebelling</option>
+          <option value="reviewer">Reviewer</option>
+        </select>
+      </div>
+      <div>
+        <label class="field-label">Tipo</label>
+        <select id="edit-type">
+          <option value="first">Firts annotation</option>
+          <option value="correction">Corrección</option>
+        </select>
+      </div>
+    </div>
+    <div class="field-row field-group">
+      <div>
+        <label class="field-label">Etapa del pack</label>
+        <select id="edit-stage">
+          <option value="annotation">Annotation</option>
+          <option value="validation">Validation</option>
+          <option value="acceptance">Acceptance</option>
+        </select>
+      </div>
+      <div>
+        <label class="field-label">Estado</label>
+        <select id="edit-pay">
+          <option value="waiting">Owes</option>
+          <option value="complete">Pay</option>
+        </select>
+      </div>
+    </div>
+    <div class="field-row field-group">
+      <div>
+        <label class="field-label">Checkpoints completados</label>
+        <input type="number" id="edit-stars" min="0">
+      </div>
+      <div>
+        <label class="field-label">Pay ID</label>
+        <input type="text" id="edit-payid" placeholder="opcional">
+      </div>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Fecha de entrega</label>
+      <input type="date" id="edit-date">
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="action-btn" id="edit-cancel-btn">Cancelar</button>
+      <button type="button" class="action-btn primary" id="edit-save-btn">Guardar</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -225,18 +533,36 @@
   let jobs = [];
 
   const seedJobs = [
-    {id:'22', stars:0, hs:6, status:'complete', pay:'complete', payDate:'21/5/26', dateFinish:'12/5/26', frames:200, stage:'acceptance', payId:'00000036', revisionFrames:null, dateRevision:null},
-    {id:'21', stars:0, hs:6, status:'complete', pay:'waiting', payDate:'-', dateFinish:'26/5/26', frames:200, stage:'acceptance', payId:null, revisionFrames:null, dateRevision:null},
-    {id:'73', stars:6, hs:4.5, status:'complete', pay:'waiting', payDate:'-', dateFinish:'04/6/26', frames:200, stage:'validation', payId:null, revisionFrames:null, dateRevision:null},
-    {id:'142', stars:7, hs:5.5, status:'complete', pay:'waiting', payDate:'-', dateFinish:'10/6/26', frames:200, stage:'annotation', payId:null, revisionFrames:129, dateRevision:'25/6/26'},
-    {id:'204', stars:1, hs:0.45, status:'complete', pay:'waiting', payDate:'-', dateFinish:'15/6/26', frames:23, stage:'annotation', payId:null, revisionFrames:null, dateRevision:null},
-    {id:'203', stars:6, hs:4.5, status:'complete', pay:'waiting', payDate:'-', dateFinish:'16/6/26', frames:200, stage:'annotation', payId:null, revisionFrames:null, dateRevision:null},
-    {id:'199', stars:6, hs:7, status:'complete', pay:'waiting', payDate:'-', dateFinish:'23/6/26', frames:200, stage:'annotation', payId:null, revisionFrames:null, dateRevision:null},
+    {id:'22', stars:0, hs:6, status:'complete', pay:'complete', payDate:'21/5/26', dateStart:'-', dateFinish:'12/5/26', dateCompleted:'12/5/26', frames:200, stage:'acceptance', role:'lebelling', payId:'00000036', revisionFrames:null, dateRevision:null, firstCount:1, correctionCount:0},
+    {id:'21', stars:0, hs:6, status:'complete', pay:'waiting', payDate:'-', dateStart:'-', dateFinish:'26/5/26', dateCompleted:null, frames:200, stage:'acceptance', role:'lebelling', payId:null, revisionFrames:null, dateRevision:null, firstCount:1, correctionCount:0},
+    {id:'73', stars:6, hs:4.5, status:'complete', pay:'waiting', payDate:'-', dateStart:'-', dateFinish:'04/6/26', dateCompleted:null, frames:200, stage:'validation', role:'lebelling', payId:null, revisionFrames:null, dateRevision:null, firstCount:1, correctionCount:0},
+    {id:'142', stars:7, hs:5.5, status:'complete', pay:'waiting', payDate:'-', dateStart:'-', dateFinish:'10/6/26', dateCompleted:null, frames:200, stage:'annotation', role:'lebelling', payId:null, revisionFrames:129, dateRevision:'25/6/26', firstCount:1, correctionCount:1},
+    {id:'204', stars:1, hs:0.45, status:'complete', pay:'waiting', payDate:'-', dateStart:'-', dateFinish:'15/6/26', dateCompleted:null, frames:23, stage:'annotation', role:'lebelling', payId:null, revisionFrames:null, dateRevision:null, firstCount:1, correctionCount:0},
+    {id:'203', stars:6, hs:4.5, status:'complete', pay:'waiting', payDate:'-', dateStart:'-', dateFinish:'16/6/26', dateCompleted:null, frames:200, stage:'annotation', role:'lebelling', payId:null, revisionFrames:null, dateRevision:null, firstCount:1, correctionCount:0},
+    {id:'199', stars:6, hs:7, status:'complete', pay:'waiting', payDate:'-', dateStart:'-', dateFinish:'23/6/26', dateCompleted:null, frames:200, stage:'annotation', role:'lebelling', payId:null, revisionFrames:null, dateRevision:null, firstCount:1, correctionCount:0},
   ];
 
   const stageLabel = { annotation:'Annotation', validation:'Validation', acceptance:'Acceptance' };
+  const roleLabel = { lebelling:'Lebelling', reviewer:'Reviewer' };
+  const typeLabel = { first:'Firts annotation', correction:'Corrección' };
 
   function checkpointsFor(hs){ return Math.round((hs * 60) / 45); }
+
+  function todayFormatted(){
+    const d = new Date();
+    return `${String(d.getDate()).padStart(2,'0')}/${d.getMonth()+1}/${String(d.getFullYear()).slice(2)}`;
+  }
+
+  function normalizeJob(j){
+    // Asegura que trabajos viejos (sin los campos nuevos) tengan valores por defecto
+    if(j.role === undefined) j.role = 'lebelling';
+    if(j.dateStart === undefined) j.dateStart = '-';
+    if(j.dateCompleted === undefined) j.dateCompleted = null;
+    if(j.firstCount === undefined) j.firstCount = 1;
+    if(j.correctionCount === undefined) j.correctionCount = 0;
+    if(j.cycles === undefined) j.cycles = 0;
+    return j;
+  }
 
   function loadJobs(){
     try{
@@ -246,6 +572,7 @@
     }catch(e){
       jobs = seedJobs.slice();
     }
+    jobs.forEach(normalizeJob);
     render();
   }
 
@@ -253,11 +580,19 @@
     try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(jobs)); }catch(e){}
   }
 
+  let activeFilters = { role: new Set(), pay: new Set() };
+
+  function jobMatchesFilters(j){
+    if(activeFilters.role.size > 0 && !activeFilters.role.has(j.role)) return false;
+    if(activeFilters.pay.size > 0 && !activeFilters.pay.has(j.pay)) return false;
+    return true;
+  }
+
   function render(){
     const list = document.getElementById('jobs-list');
     const empty = document.getElementById('empty-state');
+    const emptyFilter = document.getElementById('empty-filter-state');
     list.innerHTML = '';
-    empty.style.display = jobs.length === 0 ? 'block' : 'none';
 
     let totalFrames = 0, pending = 0, totalHs = 0;
     jobs.forEach(j => {
@@ -270,7 +605,12 @@
     document.getElementById('stat-pending').textContent = pending;
     document.getElementById('stat-hours').textContent = (Math.round(totalHs*100)/100) + ' hs';
 
+    const visibleJobs = jobs.filter(jobMatchesFilters);
+    empty.style.display = jobs.length === 0 ? 'block' : 'none';
+    emptyFilter.style.display = (jobs.length > 0 && visibleJobs.length === 0) ? 'block' : 'none';
+
     jobs.forEach((j, idx) => {
+      if(!jobMatchesFilters(j)) return;
       const cp = checkpointsFor(Number(j.hs)||0);
       const done = Math.min(j.stars||0, cp);
       const card = document.createElement('div');
@@ -281,10 +621,15 @@
         dots += `<span class="dot ${i<done?'filled':''}"></span>`;
       }
 
-      const payBadgeClass = j.pay === 'complete' ? 'badge-success' : 'badge-warning';
+      const payBadgeClass = j.pay === 'complete' ? 'badge-pay' : 'badge-owes';
+      const payLabel = j.pay === 'complete' ? 'Pay' : 'Owes';
       const revisionLine = j.revisionFrames
         ? `<div class="revision-line"><i class="ti ti-history"></i> revisión: ${j.revisionFrames} frames · ${j.dateRevision||''}</div>`
         : '';
+      const completedLine = j.dateCompleted
+        ? `<div class="revision-line"><i class="ti ti-circle-check"></i> completado: ${j.dateCompleted}</div>`
+        : '';
+      const countsLine = `<div class="revision-line"><i class="ti ti-list-numbers"></i> firts: ${j.firstCount||0} · correcciones: ${j.correctionCount||0} · ciclos: ${j.cycles||0}</div>`;
 
       card.innerHTML = `
         <div class="job-head">
@@ -293,7 +638,14 @@
             <span class="badge">${j.frames} frames</span>
             <span class="badge badge-info">${stageLabel[j.stage]||j.stage}</span>
           </div>
-          <button type="button" class="del-btn" data-idx="${idx}" aria-label="Eliminar trabajo"><i class="ti ti-trash"></i></button>
+          <div class="job-actions">
+            <button type="button" class="icon-btn edit-btn" data-idx="${idx}" aria-label="Editar trabajo" title="Editar"><i class="ti ti-pencil"></i><span class="icon-fallback">✎</span></button>
+            <button type="button" class="icon-btn del-btn" data-idx="${idx}" aria-label="Eliminar trabajo" title="Eliminar"><i class="ti ti-trash"></i><span class="icon-fallback">🗑</span></button>
+          </div>
+        </div>
+        <div class="pill-row">
+          <span class="pill pill-role-${j.role==='reviewer'?'reviewer':'lebelling'}">${roleLabel[j.role]||roleLabel.lebelling}</span>
+          <span class="pill pill-type-${j.lastType==='correction'?'correction':'first'}">${(j.lastType==='correction')?typeLabel.correction:typeLabel.first}</span>
         </div>
         <div class="dots-row">
           <div>${dots}</div>
@@ -301,9 +653,11 @@
         </div>
         <div class="meta-row">
           <span><i class="ti ti-calendar"></i> entrega ${j.dateFinish}</span>
-          <span class="badge ${payBadgeClass}">pago ${j.pay}${j.payId ? ' · '+j.payId : ''}</span>
+          <span class="badge ${payBadgeClass}">${payLabel}${j.payId ? ' · '+j.payId : ''}</span>
         </div>
+        ${countsLine}
         ${revisionLine}
+        ${completedLine}
       `;
       list.appendChild(card);
     });
@@ -311,10 +665,19 @@
     document.querySelectorAll('.del-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const idx = Number(e.currentTarget.dataset.idx);
+        const job = jobs[idx];
+        if(!confirm(`¿Eliminar el trabajo Id ${job.id}? Esta acción no se puede deshacer.`)) return;
         jobs.splice(idx, 1);
         saveJobs();
         render();
         populateTimerSelect();
+      });
+    });
+
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const idx = Number(e.currentTarget.dataset.idx);
+        openEditModal(idx);
       });
     });
 
@@ -332,7 +695,74 @@
       sel.appendChild(opt);
     });
     if(jobs.some(j=>j.id===current)) sel.value = current;
+    if(typeof renderTimer === 'function') renderTimer();
   }
+
+  // ---- Modal de edición ----
+  const editModal = document.getElementById('edit-modal');
+  let editingIdx = null;
+
+  function toDateInputValue(displayDate){
+    // displayDate viene como dd/m/aa, lo convertimos a yyyy-mm-dd para el <input type="date">
+    if(!displayDate || displayDate === '-') return '';
+    const parts = displayDate.split('/');
+    if(parts.length !== 3) return '';
+    const [d,m,yShort] = parts;
+    const year = '20' + yShort;
+    return `${year}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+  }
+
+  function fromDateInputValue(inputVal){
+    if(!inputVal) return '-';
+    const [y,m,d] = inputVal.split('-');
+    return `${d}/${Number(m)}/${y.slice(2)}`;
+  }
+
+  function openEditModal(idx){
+    editingIdx = idx;
+    const j = jobs[idx];
+    document.getElementById('edit-id').value = j.id;
+    document.getElementById('edit-frames').value = j.frames;
+    document.getElementById('edit-hs').value = j.hs;
+    document.getElementById('edit-role').value = j.role || 'lebelling';
+    document.getElementById('edit-type').value = j.lastType || 'first';
+    document.getElementById('edit-stage').value = j.stage;
+    document.getElementById('edit-pay').value = j.pay;
+    document.getElementById('edit-stars').value = j.stars || 0;
+    document.getElementById('edit-payid').value = j.payId || '';
+    document.getElementById('edit-date').value = toDateInputValue(j.dateFinish);
+    editModal.classList.remove('hidden');
+  }
+
+  function closeEditModal(){
+    editModal.classList.add('hidden');
+    editingIdx = null;
+  }
+
+  document.getElementById('edit-cancel-btn').addEventListener('click', closeEditModal);
+  editModal.addEventListener('click', (e) => {
+    if(e.target === editModal) closeEditModal();
+  });
+
+  document.getElementById('edit-save-btn').addEventListener('click', () => {
+    if(editingIdx === null) return;
+    const j = jobs[editingIdx];
+    const newId = document.getElementById('edit-id').value.trim();
+    if(!newId) return;
+    j.id = newId;
+    j.frames = Number(document.getElementById('edit-frames').value) || 0;
+    j.hs = Number(document.getElementById('edit-hs').value) || 0;
+    j.role = document.getElementById('edit-role').value;
+    j.lastType = document.getElementById('edit-type').value;
+    j.stage = document.getElementById('edit-stage').value;
+    j.pay = document.getElementById('edit-pay').value;
+    j.stars = Number(document.getElementById('edit-stars').value) || 0;
+    j.payId = document.getElementById('edit-payid').value.trim() || null;
+    j.dateFinish = fromDateInputValue(document.getElementById('edit-date').value);
+    saveJobs();
+    render();
+    closeEditModal();
+  });
 
   // Tabs
   document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -349,26 +779,89 @@
     const id = document.getElementById('new-id').value.trim();
     if(!id) return;
     const frames = Number(document.getElementById('new-frames').value) || 0;
-    const hs = Number(document.getElementById('new-hs').value) || 0;
+    const role = document.getElementById('new-role').value;
     const stage = document.getElementById('new-stage').value;
-    const pay = document.getElementById('new-pay').value;
     const dateRaw = document.getElementById('new-date').value;
-    let dateFinish = '-';
+    let dateStart = '-';
     if(dateRaw){
-      const [y,m,d] = dateRaw.split('-');
-      dateFinish = `${d}/${Number(m)}/${y.slice(2)}`;
+      dateStart = fromDateInputValue(dateRaw);
     }
-    jobs.push({id, stars:0, hs, status:'complete', pay, payDate: pay==='complete'?dateFinish:'-', dateFinish, frames, stage, payId:null, revisionFrames:null, dateRevision:null});
+    jobs.push({
+      id, stars:0, hs:0, status:'complete', pay:'waiting', payDate:'-',
+      dateStart, dateFinish:'-', dateCompleted:null,
+      frames, stage, role, lastType:'first',
+      payId:null, revisionFrames:null, dateRevision:null,
+      firstCount:1, correctionCount:0
+    });
     saveJobs();
     render();
     document.getElementById('new-id').value='';
     document.getElementById('new-frames').value='';
-    document.getElementById('new-hs').value='';
     document.getElementById('new-date').value='';
     const fb = document.getElementById('add-feedback');
     fb.style.display='block';
     setTimeout(()=>{ fb.style.display='none'; }, 2000);
   });
+
+  // ---- Backup: exportar / importar ----
+  document.getElementById('export-btn').addEventListener('click', () => {
+    const payload = {
+      exportedAt: new Date().toISOString(),
+      jobs: jobs,
+      timer: (function(){
+        try{ return JSON.parse(localStorage.getItem(TIMER_KEY) || '{}'); }catch(e){ return {}; }
+      })()
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const stamp = new Date().toISOString().slice(0,10);
+    a.href = url;
+    a.download = `cvat-respaldo-${stamp}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showBackupFeedback('Respaldo exportado.');
+  });
+
+  document.getElementById('import-btn').addEventListener('click', () => {
+    document.getElementById('import-file').click();
+  });
+
+  document.getElementById('import-file').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try{
+        const parsed = JSON.parse(ev.target.result);
+        const importedJobs = Array.isArray(parsed) ? parsed : parsed.jobs;
+        if(!Array.isArray(importedJobs)) throw new Error('Formato inválido');
+        if(!confirm(`Se van a importar ${importedJobs.length} trabajo(s) y se reemplazarán los datos actuales. ¿Continuar?`)) return;
+        jobs = importedJobs.map(normalizeJob);
+        saveJobs();
+        if(parsed.timer){
+          try{ localStorage.setItem(TIMER_KEY, JSON.stringify(parsed.timer)); }catch(err){}
+          loadTimerState();
+        }
+        render();
+        showBackupFeedback('Respaldo importado correctamente.');
+      }catch(err){
+        showBackupFeedback('El archivo no es un respaldo válido.', true);
+      }
+      e.target.value = '';
+    };
+    reader.readAsText(file);
+  });
+
+  function showBackupFeedback(msg, isError){
+    const fb = document.getElementById('backup-feedback');
+    fb.textContent = msg;
+    fb.style.color = isError ? '#b3261e' : 'var(--success-text)';
+    fb.style.display = 'block';
+    setTimeout(()=>{ fb.style.display='none'; }, 3000);
+  }
 
   // Timer
   const FOCUS_SEC = 45*60;
@@ -382,6 +875,12 @@
     return String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
   }
 
+  function getSelectedJob(){
+    const jobId = document.getElementById('timer-job').value;
+    if(!jobId) return null;
+    return jobs.find(j => j.id === jobId) || null;
+  }
+
   function renderTimer(){
     document.getElementById('timer-display').textContent = formatTime(timerState.remaining);
     document.getElementById('timer-phase-label').textContent = timerState.phase === 'focus' ? 'Foco (45 min)' : 'Descanso (15 min)';
@@ -390,16 +889,24 @@
       ? '<i class="ti ti-player-pause"></i><span>Pausar</span>'
       : '<i class="ti ti-player-play"></i><span>Iniciar</span>';
 
+    const job = getSelectedJob();
+    const jobCycles = job ? (job.cycles||0) : 0;
+
     const dotsWrap = document.getElementById('cycle-dots');
     dotsWrap.innerHTML = '';
-    const totalDots = Math.max(timerState.cyclesToday, 4);
+    const totalDots = Math.max(jobCycles, 4);
     for(let i=0;i<totalDots;i++){
       const d = document.createElement('span');
-      d.className = 'cycle-dot' + (i < timerState.cyclesToday ? ' filled' : '');
+      d.className = 'cycle-dot' + (i < jobCycles ? ' filled' : '');
       dotsWrap.appendChild(d);
     }
-    document.getElementById('cycle-count-label').textContent =
-      timerState.cyclesToday + (timerState.cyclesToday===1 ? ' ciclo completado hoy' : ' ciclos completados hoy');
+
+    const label = document.getElementById('cycle-count-label');
+    if(job){
+      label.textContent = `Id ${job.id}: ${jobCycles} ${jobCycles===1 ? 'ciclo' : 'ciclos'} · ${timerState.cyclesToday} ${timerState.cyclesToday===1 ? 'ciclo total hoy' : 'ciclos totales hoy'} (todos los IDs)`;
+    } else {
+      label.textContent = `Elegí un trabajo para ver sus ciclos · ${timerState.cyclesToday} ${timerState.cyclesToday===1 ? 'ciclo total hoy' : 'ciclos totales hoy'} (todos los IDs)`;
+    }
   }
 
   function saveTimerState(){
@@ -417,6 +924,23 @@
     renderTimer();
   }
 
+  function registerCycleOnJob(){
+    const job = getSelectedJob();
+    if(!job) return;
+    const cp = checkpointsFor(Number(job.hs)||0);
+    job.stars = Math.min((job.stars||0) + 1, cp);
+    job.cycles = (job.cycles||0) + 1;
+    const taskType = document.getElementById('timer-type').value;
+    if(taskType === 'correction'){
+      job.correctionCount = (job.correctionCount||0) + 1;
+    } else {
+      job.firstCount = (job.firstCount||0) + 1;
+    }
+    job.lastType = taskType;
+    saveJobs();
+    render();
+  }
+
   function tick(){
     if(timerState.remaining > 0){
       timerState.remaining--;
@@ -426,16 +950,7 @@
         timerState.phase = 'break';
         timerState.remaining = BREAK_SEC;
         saveTimerState();
-        const jobId = document.getElementById('timer-job').value;
-        if(jobId){
-          const job = jobs.find(j => j.id === jobId);
-          if(job){
-            const cp = checkpointsFor(Number(job.hs)||0);
-            job.stars = Math.min((job.stars||0) + 1, cp);
-            saveJobs();
-            render();
-          }
-        }
+        registerCycleOnJob();
       } else {
         timerState.phase = 'focus';
         timerState.remaining = FOCUS_SEC;
@@ -443,6 +958,8 @@
     }
     renderTimer();
   }
+
+  document.getElementById('timer-job').addEventListener('change', renderTimer);
 
   document.getElementById('timer-toggle').addEventListener('click', () => {
     timerState.running = !timerState.running;
@@ -467,8 +984,321 @@
     tick();
   });
 
+  document.getElementById('timer-finish').addEventListener('click', () => {
+    const jobId = document.getElementById('timer-job').value;
+    if(!jobId){
+      alert('Elegí un trabajo asociado antes de finalizar.');
+      return;
+    }
+    const job = jobs.find(j => j.id === jobId);
+    if(!job) return;
+    if(!confirm(`¿Marcar el Id ${job.id} como completado con fecha de hoy?`)) return;
+    job.dateCompleted = todayFormatted();
+    job.status = 'complete';
+    saveJobs();
+    render();
+    clearInterval(intervalHandle);
+    timerState.running = false;
+    timerState.phase = 'focus';
+    timerState.remaining = FOCUS_SEC;
+    renderTimer();
+  });
+
+  function body_has_icons_unavailable(){
+    return document.body.classList.contains('icons-unavailable');
+  }
+
+  function checkIconFontAvailability(){
+    // Si el navegador no soporta la Font Loading API, no tocamos nada (asumimos que está bien)
+    if(!('fonts' in document)) return;
+    document.fonts.ready.then(() => {
+      let found = false;
+      document.fonts.forEach(f => {
+        if(f.family.toLowerCase().includes('tabler')) found = true;
+      });
+      if(!found){
+        document.body.classList.add('icons-unavailable');
+      }
+    }).catch(() => {
+      // Si algo falla en la detección, mostramos el fallback por seguridad
+      document.body.classList.add('icons-unavailable');
+    });
+  }
+
+  // ---- Atajos issue reviewer (snippets) ----
+  const SNIPPETS_KEY = 'cvat-snippets-v1';
+  let snippets = [];
+  let editingSnippetIdx = null;
+
+  function loadSnippets(){
+    try{
+      const raw = localStorage.getItem(SNIPPETS_KEY);
+      snippets = raw ? JSON.parse(raw) : [];
+    }catch(e){ snippets = []; }
+    renderSnippets();
+  }
+
+  function saveSnippets(){
+    try{ localStorage.setItem(SNIPPETS_KEY, JSON.stringify(snippets)); }catch(e){}
+  }
+
+  function renderSnippets(){
+    const list = document.getElementById('snippets-list');
+    list.innerHTML = '';
+    if(snippets.length === 0){
+      list.innerHTML = '<p class="note-card-empty">Todavía no agregaste atajos. Usá "Agregar texto" para crear el primero.</p>';
+      return;
+    }
+    snippets.forEach((s, idx) => {
+      const item = document.createElement('div');
+      item.className = 'note-card';
+      item.innerHTML = `
+        <div class="note-card-bar"></div>
+        <div class="note-card-body">
+          <p class="note-card-text"></p>
+        </div>
+        <div class="note-card-footer">
+          <button type="button" class="icon-btn snippet-copy-btn" data-idx="${idx}" title="Copiar">
+            <i class="ti ti-copy snippet-copy-icon"></i><i class="ti ti-check snippet-copied-icon" style="display:none;"></i>
+            <span class="icon-fallback snippet-copy-fallback">⧉</span><span class="icon-fallback snippet-copied-fallback" style="display:none;">✓</span>
+          </button>
+          <button type="button" class="icon-btn snippet-edit-btn" data-idx="${idx}" title="Editar"><i class="ti ti-pencil"></i><span class="icon-fallback">✎</span></button>
+          <button type="button" class="icon-btn snippet-del-btn" data-idx="${idx}" title="Eliminar"><i class="ti ti-trash"></i><span class="icon-fallback">🗑</span></button>
+        </div>
+      `;
+      item.querySelector('.note-card-text').textContent = s.text;
+      list.appendChild(item);
+    });
+
+    list.querySelectorAll('.snippet-copy-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const idx = Number(btn.dataset.idx);
+        await copyText(snippets[idx].text);
+        const copyIcon = btn.querySelector('.snippet-copy-icon');
+        const copiedIcon = btn.querySelector('.snippet-copied-icon');
+        const copyFallback = btn.querySelector('.snippet-copy-fallback');
+        const copiedFallback = btn.querySelector('.snippet-copied-fallback');
+        copyIcon.style.display = 'none';
+        copyFallback.style.display = 'none';
+        copiedIcon.style.display = '';
+        copiedFallback.style.display = body_has_icons_unavailable() ? 'inline' : 'none';
+        setTimeout(()=>{
+          copyIcon.style.display = '';
+          copyFallback.style.display = body_has_icons_unavailable() ? 'inline' : 'none';
+          copiedIcon.style.display = 'none';
+          copiedFallback.style.display = 'none';
+        }, 1500);
+      });
+    });
+    list.querySelectorAll('.snippet-edit-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        openSnippetModal(Number(e.currentTarget.dataset.idx));
+      });
+    });
+    list.querySelectorAll('.snippet-del-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const idx = Number(e.currentTarget.dataset.idx);
+        if(!confirm('¿Eliminar este atajo?')) return;
+        snippets.splice(idx, 1);
+        saveSnippets();
+        renderSnippets();
+      });
+    });
+  }
+
+  async function copyText(text){
+    try{
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        await navigator.clipboard.writeText(text);
+        return;
+      }
+    }catch(e){ /* sigue al fallback */ }
+    // Fallback para navegadores/contextos sin Clipboard API
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try{ document.execCommand('copy'); }catch(e){}
+    document.body.removeChild(ta);
+  }
+
+  function openSnippetModal(idx){
+    editingSnippetIdx = (idx === undefined) ? null : idx;
+    document.getElementById('snippet-modal-title').textContent = editingSnippetIdx === null ? 'Agregar atajo' : 'Editar atajo';
+    document.getElementById('snippet-text-input').value = editingSnippetIdx === null ? '' : snippets[editingSnippetIdx].text;
+    document.getElementById('snippet-modal').classList.remove('hidden');
+  }
+
+  function closeSnippetModal(){
+    document.getElementById('snippet-modal').classList.add('hidden');
+    editingSnippetIdx = null;
+  }
+
+  document.getElementById('snippet-add-btn').addEventListener('click', () => openSnippetModal());
+  document.getElementById('snippet-cancel-btn').addEventListener('click', closeSnippetModal);
+  document.getElementById('snippet-modal').addEventListener('click', (e) => {
+    if(e.target === document.getElementById('snippet-modal')) closeSnippetModal();
+  });
+  document.getElementById('snippet-save-btn').addEventListener('click', () => {
+    const text = document.getElementById('snippet-text-input').value.trim();
+    if(!text) return;
+    if(editingSnippetIdx === null){
+      snippets.push({ text });
+    } else {
+      snippets[editingSnippetIdx].text = text;
+    }
+    saveSnippets();
+    renderSnippets();
+    closeSnippetModal();
+  });
+
+  // ---- Feedbacks to take care ----
+  const FEEDBACKS_KEY = 'cvat-feedbacks-v1';
+  let feedbacks = [];
+  let editingFeedbackIdx = null;
+
+  function loadFeedbacks(){
+    try{
+      const raw = localStorage.getItem(FEEDBACKS_KEY);
+      feedbacks = raw ? JSON.parse(raw) : [];
+    }catch(e){ feedbacks = []; }
+    renderFeedbacks();
+  }
+
+  function saveFeedbacks(){
+    try{ localStorage.setItem(FEEDBACKS_KEY, JSON.stringify(feedbacks)); }catch(e){}
+  }
+
+  function renderFeedbacks(){
+    const list = document.getElementById('feedbacks-list');
+    list.innerHTML = '';
+    if(feedbacks.length === 0){
+      list.innerHTML = '<p class="note-card-empty">Todavía no agregaste feedbacks. Usá "Agregar item" para crear el primero.</p>';
+      return;
+    }
+    feedbacks.forEach((f, idx) => {
+      const item = document.createElement('div');
+      item.className = 'note-card';
+      item.innerHTML = `
+        <div class="note-card-bar"></div>
+        <div class="note-card-body">
+          <p class="note-card-text"></p>
+        </div>
+        <div class="note-card-footer">
+          <button type="button" class="icon-btn feedback-edit-btn" data-idx="${idx}" title="Editar"><i class="ti ti-pencil"></i><span class="icon-fallback">✎</span></button>
+          <button type="button" class="icon-btn feedback-del-btn" data-idx="${idx}" title="Eliminar"><i class="ti ti-trash"></i><span class="icon-fallback">🗑</span></button>
+        </div>
+      `;
+      item.querySelector('.note-card-text').textContent = f.text;
+      list.appendChild(item);
+    });
+
+    list.querySelectorAll('.feedback-edit-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        openFeedbackModal(Number(e.currentTarget.dataset.idx));
+      });
+    });
+    list.querySelectorAll('.feedback-del-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const idx = Number(e.currentTarget.dataset.idx);
+        if(!confirm('¿Eliminar este feedback?')) return;
+        feedbacks.splice(idx, 1);
+        saveFeedbacks();
+        renderFeedbacks();
+      });
+    });
+  }
+
+  function openFeedbackModal(idx){
+    editingFeedbackIdx = (idx === undefined) ? null : idx;
+    document.getElementById('feedback-modal-title').textContent = editingFeedbackIdx === null ? 'Agregar feedback' : 'Editar feedback';
+    document.getElementById('feedback-text-input').value = editingFeedbackIdx === null ? '' : feedbacks[editingFeedbackIdx].text;
+    document.getElementById('feedback-modal').classList.remove('hidden');
+  }
+
+  function closeFeedbackModal(){
+    document.getElementById('feedback-modal').classList.add('hidden');
+    editingFeedbackIdx = null;
+  }
+
+  document.getElementById('feedback-add-btn').addEventListener('click', () => openFeedbackModal());
+  document.getElementById('feedback-cancel-btn').addEventListener('click', closeFeedbackModal);
+  document.getElementById('feedback-modal').addEventListener('click', (e) => {
+    if(e.target === document.getElementById('feedback-modal')) closeFeedbackModal();
+  });
+  document.getElementById('feedback-save-btn').addEventListener('click', () => {
+    const text = document.getElementById('feedback-text-input').value.trim();
+    if(!text) return;
+    if(editingFeedbackIdx === null){
+      feedbacks.push({ text });
+    } else {
+      feedbacks[editingFeedbackIdx].text = text;
+    }
+    saveFeedbacks();
+    renderFeedbacks();
+    closeFeedbackModal();
+  });
+
+  // ---- Colapsar/expandir slides ----
+  document.getElementById('snippets-toggle').addEventListener('click', () => {
+    document.getElementById('snippets-section').classList.toggle('collapsed');
+  });
+  document.getElementById('feedbacks-toggle').addEventListener('click', () => {
+    document.getElementById('feedbacks-section').classList.toggle('collapsed');
+  });
+
+  // ---- Filtro de trabajos ----
+  const filterPanel = document.getElementById('filter-panel');
+  const filterToggleBtn = document.getElementById('filter-toggle-btn');
+  const filterCountBadge = document.getElementById('filter-count-badge');
+
+  function updateFilterUi(){
+    const totalActive = activeFilters.role.size + activeFilters.pay.size;
+    if(totalActive > 0){
+      filterCountBadge.style.display = 'flex';
+      filterCountBadge.textContent = totalActive;
+      filterToggleBtn.classList.add('active');
+    } else {
+      filterCountBadge.style.display = 'none';
+      filterToggleBtn.classList.remove('active');
+    }
+  }
+
+  filterToggleBtn.addEventListener('click', () => {
+    filterPanel.classList.toggle('hidden');
+  });
+
+  function bindFilterPill(btnId, group, value){
+    const btn = document.getElementById(btnId);
+    btn.addEventListener('click', () => {
+      const isActive = btn.classList.toggle('active');
+      if(isActive) activeFilters[group].add(value);
+      else activeFilters[group].delete(value);
+      updateFilterUi();
+      render();
+    });
+  }
+
+  bindFilterPill('filter-role-lebelling', 'role', 'lebelling');
+  bindFilterPill('filter-role-reviewer', 'role', 'reviewer');
+  bindFilterPill('filter-pay-pay', 'pay', 'complete');
+  bindFilterPill('filter-pay-owes', 'pay', 'waiting');
+
+  document.getElementById('filter-clear-btn').addEventListener('click', () => {
+    activeFilters.role.clear();
+    activeFilters.pay.clear();
+    document.querySelectorAll('#filter-panel .filter-pill').forEach(btn => btn.classList.remove('active'));
+    updateFilterUi();
+    render();
+  });
+
+  checkIconFontAvailability();
   loadJobs();
   loadTimerState();
+  loadSnippets();
+  loadFeedbacks();
 })();
 </script>
 </body>
