@@ -108,6 +108,9 @@
   .filter-clear-btn:hover{ color:var(--text-primary); }
   .stat-label{ font-size:13px; color:var(--text-secondary); margin:0 0 4px; }
   .stat-value{ font-size:24px; font-weight:500; margin:0; }
+  .stat-breakdown{ font-size:12px; color:var(--text-tertiary); margin:4px 0 0; }
+  .stat-breakdown .sb-lebelling{ color:var(--magenta-text); font-weight:600; }
+  .stat-breakdown .sb-reviewer{ color:var(--maroon-text); font-weight:600; }
 
   .jobs-list{ display:flex; flex-direction:column; gap:10px; }
   .job-card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:14px 16px; }
@@ -224,7 +227,7 @@
 
   .note-card{
     background:var(--surface);
-    border-radius:14px;
+    border-radius:10px;
     box-shadow:0 1px 2px rgba(0,0,0,0.06), 0 4px 10px rgba(0,0,0,0.07);
     border:1px solid var(--border);
     overflow:hidden;
@@ -247,8 +250,8 @@
   @media (prefers-color-scheme: dark){
     .note-card-bar{ background:linear-gradient(to bottom, rgba(255,255,255,0.14), rgba(255,255,255,0.04)); }
   }
-  .note-card-body{ padding:14px 16px; flex:1; display:flex; align-items:center; min-width:0; }
-  .note-card-text{ font-size:14px; line-height:1.5; color:var(--text-primary); white-space:pre-wrap; word-break:break-word; margin:0; }
+  .note-card-body{ padding:9px 14px; flex:1; display:flex; align-items:center; min-width:0; }
+  .note-card-text{ font-size:13px; line-height:1.45; color:var(--text-primary); white-space:pre-wrap; word-break:break-word; margin:0; }
   .note-card-footer{
     display:flex; flex-direction:column; justify-content:center; gap:4px;
     padding:8px 10px; border-left:1px solid var(--border); background:var(--surface-2); flex-shrink:0;
@@ -260,6 +263,53 @@
     padding:24px 12px; border:1px dashed var(--border-strong); border-radius:14px;
   }
   .copy-feedback-toast{ font-size:12px; color:var(--success-text); padding:0 0 0 16px; margin:0; display:none; align-self:flex-start; }
+
+  /* Snippets: drag and drop + acciones a la izquierda + recuadro fino */
+  .note-card-snippet{ flex-direction:row; min-height:auto; cursor:default; }
+  .note-card-snippet .note-card-footer{
+    flex-direction:row; border-left:none; border-right:1px solid var(--border);
+    padding:6px 4px; gap:0;
+  }
+  .note-card-snippet .note-card-body{ padding:8px 12px; }
+  .note-card-snippet .note-card-text{ font-size:13px; line-height:1.4; }
+  .drag-handle{ cursor:grab; color:var(--text-tertiary); display:flex; align-items:center; padding:6px 2px; font-size:16px; touch-action:none; }
+  .drag-handle:active{ cursor:grabbing; }
+  .note-card-snippet.dragging{ opacity:0.4; }
+  .note-card-snippet.drag-over{ outline:2px dashed var(--info-text); outline-offset:2px; }
+
+  .payments-hero{
+    background:linear-gradient(135deg, var(--pay-bg), var(--surface-2));
+    border-radius:var(--radius-lg); padding:24px; text-align:center; margin-bottom:20px;
+  }
+  .payments-hero-label{ font-size:13px; color:var(--text-secondary); margin:0 0 6px; text-transform:uppercase; letter-spacing:0.04em; }
+  .payments-hero-value{ font-size:40px; font-weight:600; color:var(--pay-text); margin:0; line-height:1.1; }
+  .payments-hero-sub{ font-size:13px; color:var(--text-tertiary); margin:8px 0 0; }
+
+  .pay-breakdown-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:18px; }
+  @media (max-width:480px){ .pay-breakdown-grid{ grid-template-columns:1fr; } }
+  .pay-breakdown-card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:16px; border-left:4px solid transparent; }
+  .pay-breakdown-lebelling{ border-left-color:var(--magenta-text); }
+  .pay-breakdown-reviewer{ border-left-color:var(--maroon-text); }
+  .pay-breakdown-role{ font-size:13px; font-weight:600; margin:0 0 2px; }
+  .pay-breakdown-lebelling .pay-breakdown-role{ color:var(--magenta-text); }
+  .pay-breakdown-reviewer .pay-breakdown-role{ color:var(--maroon-text); }
+  .pay-breakdown-rate{ font-size:12px; color:var(--text-tertiary); margin:0 0 10px; }
+  .pay-breakdown-amount{ font-size:26px; font-weight:600; margin:0; color:var(--text-primary); }
+  .pay-breakdown-detail{ font-size:12px; color:var(--text-tertiary); margin:6px 0 0; }
+
+  .pay-note{ font-size:12px; color:var(--text-tertiary); display:flex; gap:6px; align-items:flex-start; margin:0 0 24px; line-height:1.5; }
+  .pay-note strong{ color:var(--text-secondary); }
+
+  .pay-detail-title{ font-size:14px; font-weight:500; margin:0 0 12px; }
+  .pay-detail-list{ display:flex; flex-direction:column; gap:8px; }
+  .pay-detail-row{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    background:var(--surface-2); border-radius:var(--radius-md); padding:10px 14px; font-size:13px;
+  }
+  .pay-detail-left{ display:flex; align-items:center; gap:10px; min-width:0; }
+  .pay-detail-id{ font-weight:500; flex-shrink:0; }
+  .pay-detail-meta{ color:var(--text-tertiary); font-size:12px; white-space:nowrap; }
+  .pay-detail-amount{ font-weight:600; color:var(--pay-text); flex-shrink:0; }
 </style>
 </head>
 <body>
@@ -270,6 +320,7 @@
   <div class="tabs">
     <button type="button" class="tab-btn active" data-tab="trabajos">Trabajos</button>
     <button type="button" class="tab-btn" data-tab="timer">Cronómetro</button>
+    <button type="button" class="tab-btn" data-tab="payments">Payments</button>
     <button type="button" class="tab-btn" data-tab="nuevo">Agregar</button>
   </div>
 
@@ -308,6 +359,7 @@
       <div class="stat-card">
         <p class="stat-label">Frames en pack</p>
         <p class="stat-value" id="stat-frames">-</p>
+        <p class="stat-breakdown" id="stat-frames-breakdown">-</p>
       </div>
       <div class="stat-card">
         <p class="stat-label">Owes</p>
@@ -404,6 +456,35 @@
         <button type="button" class="action-btn primary" id="feedback-save-btn">Guardar</button>
       </div>
     </div>
+  </div>
+
+  <div id="panel-payments" class="panel">
+    <div class="payments-hero">
+      <p class="payments-hero-label">Total a cobrar (Owes · completados)</p>
+      <p class="payments-hero-value" id="pay-total-usd">USD 0.00</p>
+      <p class="payments-hero-sub" id="pay-total-frames-sub">0 frames pagables</p>
+    </div>
+
+    <div class="pay-breakdown-grid">
+      <div class="pay-breakdown-card pay-breakdown-lebelling">
+        <p class="pay-breakdown-role">Lebelling</p>
+        <p class="pay-breakdown-rate">USD 0.80 / frame</p>
+        <p class="pay-breakdown-amount" id="pay-lebelling-usd">USD 0.00</p>
+        <p class="pay-breakdown-detail" id="pay-lebelling-detail">0 frames · 0 packs</p>
+      </div>
+      <div class="pay-breakdown-card pay-breakdown-reviewer">
+        <p class="pay-breakdown-role">Reviewer</p>
+        <p class="pay-breakdown-rate">USD 0.40 / frame</p>
+        <p class="pay-breakdown-amount" id="pay-reviewer-usd">USD 0.00</p>
+        <p class="pay-breakdown-detail" id="pay-reviewer-detail">0 frames · 0 packs</p>
+      </div>
+    </div>
+
+    <p class="pay-note"><i class="ti ti-info-circle"></i><span class="icon-fallback">ⓘ</span><span>Se calcula solo con trabajos <strong>completados</strong> que todavía están en estado <strong>Owes</strong>. El pago se efectúa la última semana del mes.</span></p>
+
+    <h3 class="pay-detail-title">Detalle de packs a cobrar</h3>
+    <div id="pay-detail-list" class="pay-detail-list"></div>
+    <p id="pay-empty-state" class="empty-state" style="display:none;">No hay trabajos completados pendientes de cobro en este momento.</p>
   </div>
 
   <div id="panel-nuevo" class="panel">
@@ -515,6 +596,20 @@
         <input type="text" id="edit-payid" placeholder="opcional">
       </div>
     </div>
+    <div class="field-row field-group">
+      <div>
+        <label class="field-label">Firts annotation (cant.)</label>
+        <input type="number" id="edit-firstcount" min="0">
+      </div>
+      <div>
+        <label class="field-label">Correcciones (cant.)</label>
+        <input type="number" id="edit-correctioncount" min="0">
+      </div>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Ciclos de cronómetro</label>
+      <input type="number" id="edit-cycles" min="0">
+    </div>
     <div class="field-group">
       <label class="field-label">Fecha de entrega</label>
       <input type="date" id="edit-date">
@@ -594,14 +689,19 @@
     const emptyFilter = document.getElementById('empty-filter-state');
     list.innerHTML = '';
 
-    let totalFrames = 0, pending = 0, totalHs = 0;
+    let totalFrames = 0, pending = 0, totalHs = 0, framesLebelling = 0, framesReviewer = 0;
     jobs.forEach(j => {
-      totalFrames += Number(j.frames)||0;
+      const f = Number(j.frames)||0;
+      totalFrames += f;
       totalHs += Number(j.hs)||0;
       if(j.pay === 'waiting') pending++;
+      if(j.role === 'reviewer') framesReviewer += f;
+      else framesLebelling += f;
     });
     document.getElementById('stat-total').textContent = jobs.length;
     document.getElementById('stat-frames').textContent = totalFrames.toLocaleString('es-AR');
+    document.getElementById('stat-frames-breakdown').innerHTML =
+      `<span class="sb-lebelling">${framesLebelling.toLocaleString('es-AR')} lebelling</span> · <span class="sb-reviewer">${framesReviewer.toLocaleString('es-AR')} reviewer</span>`;
     document.getElementById('stat-pending').textContent = pending;
     document.getElementById('stat-hours').textContent = (Math.round(totalHs*100)/100) + ' hs';
 
@@ -682,6 +782,7 @@
     });
 
     populateTimerSelect();
+    renderPayments();
   }
 
   function populateTimerSelect(){
@@ -696,6 +797,76 @@
     });
     if(jobs.some(j=>j.id===current)) sel.value = current;
     if(typeof renderTimer === 'function') renderTimer();
+  }
+
+  // ---- Payments ----
+  const RATE_LEBELLING = 0.80;
+  const RATE_REVIEWER = 0.40;
+
+  function formatUsd(n){
+    return 'USD ' + n.toLocaleString('en-US', { minimumFractionDigits:2, maximumFractionDigits:2 });
+  }
+
+  function renderPayments(){
+    const totalEl = document.getElementById('pay-total-usd');
+    const totalSubEl = document.getElementById('pay-total-frames-sub');
+    const lebUsdEl = document.getElementById('pay-lebelling-usd');
+    const lebDetailEl = document.getElementById('pay-lebelling-detail');
+    const revUsdEl = document.getElementById('pay-reviewer-usd');
+    const revDetailEl = document.getElementById('pay-reviewer-detail');
+    const detailList = document.getElementById('pay-detail-list');
+    const emptyState = document.getElementById('pay-empty-state');
+    if(!totalEl) return; // el panel todavia no esta en el DOM (no deberia pasar, pero por seguridad)
+
+    const payableJobs = jobs.filter(j => j.status === 'complete' && j.pay === 'waiting');
+
+    let lebFrames = 0, lebPacks = 0, lebUsd = 0;
+    let revFrames = 0, revPacks = 0, revUsd = 0;
+
+    payableJobs.forEach(j => {
+      const f = Number(j.frames)||0;
+      if(j.role === 'reviewer'){
+        revFrames += f; revPacks++; revUsd += f * RATE_REVIEWER;
+      } else {
+        lebFrames += f; lebPacks++; lebUsd += f * RATE_LEBELLING;
+      }
+    });
+
+    const totalUsd = lebUsd + revUsd;
+    const totalFramesPayable = lebFrames + revFrames;
+
+    totalEl.textContent = formatUsd(totalUsd);
+    totalSubEl.textContent = `${totalFramesPayable.toLocaleString('es-AR')} frames pagables · ${payableJobs.length} pack${payableJobs.length===1?'':'s'}`;
+
+    lebUsdEl.textContent = formatUsd(lebUsd);
+    lebDetailEl.textContent = `${lebFrames.toLocaleString('es-AR')} frames · ${lebPacks} pack${lebPacks===1?'':'s'}`;
+
+    revUsdEl.textContent = formatUsd(revUsd);
+    revDetailEl.textContent = `${revFrames.toLocaleString('es-AR')} frames · ${revPacks} pack${revPacks===1?'':'s'}`;
+
+    detailList.innerHTML = '';
+    emptyState.style.display = payableJobs.length === 0 ? 'block' : 'none';
+
+    payableJobs
+      .slice()
+      .sort((a,b) => (Number(b.frames)||0) - (Number(a.frames)||0))
+      .forEach(j => {
+        const f = Number(j.frames)||0;
+        const rate = j.role === 'reviewer' ? RATE_REVIEWER : RATE_LEBELLING;
+        const amount = f * rate;
+        const roleLabelText = j.role === 'reviewer' ? 'Reviewer' : 'Lebelling';
+        const row = document.createElement('div');
+        row.className = 'pay-detail-row';
+        row.innerHTML = `
+          <div class="pay-detail-left">
+            <span class="pay-detail-id">Id ${j.id}</span>
+            <span class="pay-detail-meta">${roleLabelText} · ${f.toLocaleString('es-AR')} frames · USD ${rate.toFixed(2)}/frame</span>
+          </div>
+          <span class="pay-detail-amount"></span>
+        `;
+        row.querySelector('.pay-detail-amount').textContent = formatUsd(amount);
+        detailList.appendChild(row);
+      });
   }
 
   // ---- Modal de edición ----
@@ -730,6 +901,9 @@
     document.getElementById('edit-pay').value = j.pay;
     document.getElementById('edit-stars').value = j.stars || 0;
     document.getElementById('edit-payid').value = j.payId || '';
+    document.getElementById('edit-firstcount').value = j.firstCount || 0;
+    document.getElementById('edit-correctioncount').value = j.correctionCount || 0;
+    document.getElementById('edit-cycles').value = j.cycles || 0;
     document.getElementById('edit-date').value = toDateInputValue(j.dateFinish);
     editModal.classList.remove('hidden');
   }
@@ -758,6 +932,9 @@
     j.pay = document.getElementById('edit-pay').value;
     j.stars = Number(document.getElementById('edit-stars').value) || 0;
     j.payId = document.getElementById('edit-payid').value.trim() || null;
+    j.firstCount = Number(document.getElementById('edit-firstcount').value) || 0;
+    j.correctionCount = Number(document.getElementById('edit-correctioncount').value) || 0;
+    j.cycles = Number(document.getElementById('edit-cycles').value) || 0;
     j.dateFinish = fromDateInputValue(document.getElementById('edit-date').value);
     saveJobs();
     render();
@@ -903,9 +1080,9 @@
 
     const label = document.getElementById('cycle-count-label');
     if(job){
-      label.textContent = `Id ${job.id}: ${jobCycles} ${jobCycles===1 ? 'ciclo' : 'ciclos'} · ${timerState.cyclesToday} ${timerState.cyclesToday===1 ? 'ciclo total hoy' : 'ciclos totales hoy'} (todos los IDs)`;
+      label.textContent = `Id ${job.id}: ${jobCycles} ${jobCycles===1 ? 'ciclo completado' : 'ciclos completados'}`;
     } else {
-      label.textContent = `Elegí un trabajo para ver sus ciclos · ${timerState.cyclesToday} ${timerState.cyclesToday===1 ? 'ciclo total hoy' : 'ciclos totales hoy'} (todos los IDs)`;
+      label.textContent = 'Elegí un trabajo para ver sus ciclos';
     }
   }
 
@@ -1042,6 +1219,8 @@
     try{ localStorage.setItem(SNIPPETS_KEY, JSON.stringify(snippets)); }catch(e){}
   }
 
+  let draggedSnippetIdx = null;
+
   function renderSnippets(){
     const list = document.getElementById('snippets-list');
     list.innerHTML = '';
@@ -1051,11 +1230,12 @@
     }
     snippets.forEach((s, idx) => {
       const item = document.createElement('div');
-      item.className = 'note-card';
+      item.className = 'note-card note-card-snippet';
+      item.draggable = true;
+      item.dataset.idx = idx;
       item.innerHTML = `
-        <div class="note-card-bar"></div>
-        <div class="note-card-body">
-          <p class="note-card-text"></p>
+        <div class="drag-handle" title="Arrastrar para reordenar">
+          <i class="ti ti-grip-vertical"></i><span class="icon-fallback">⠿</span>
         </div>
         <div class="note-card-footer">
           <button type="button" class="icon-btn snippet-copy-btn" data-idx="${idx}" title="Copiar">
@@ -1064,6 +1244,9 @@
           </button>
           <button type="button" class="icon-btn snippet-edit-btn" data-idx="${idx}" title="Editar"><i class="ti ti-pencil"></i><span class="icon-fallback">✎</span></button>
           <button type="button" class="icon-btn snippet-del-btn" data-idx="${idx}" title="Eliminar"><i class="ti ti-trash"></i><span class="icon-fallback">🗑</span></button>
+        </div>
+        <div class="note-card-body">
+          <p class="note-card-text"></p>
         </div>
       `;
       item.querySelector('.note-card-text').textContent = s.text;
@@ -1100,6 +1283,39 @@
         const idx = Number(e.currentTarget.dataset.idx);
         if(!confirm('¿Eliminar este atajo?')) return;
         snippets.splice(idx, 1);
+        saveSnippets();
+        renderSnippets();
+      });
+    });
+
+    // ---- Drag and drop para reordenar ----
+    list.querySelectorAll('.note-card-snippet').forEach(card => {
+      card.addEventListener('dragstart', (e) => {
+        draggedSnippetIdx = Number(card.dataset.idx);
+        card.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+      card.addEventListener('dragend', () => {
+        card.classList.remove('dragging');
+        list.querySelectorAll('.note-card-snippet').forEach(c => c.classList.remove('drag-over'));
+        draggedSnippetIdx = null;
+      });
+      card.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        if(Number(card.dataset.idx) !== draggedSnippetIdx){
+          card.classList.add('drag-over');
+        }
+      });
+      card.addEventListener('dragleave', () => {
+        card.classList.remove('drag-over');
+      });
+      card.addEventListener('drop', (e) => {
+        e.preventDefault();
+        card.classList.remove('drag-over');
+        const targetIdx = Number(card.dataset.idx);
+        if(draggedSnippetIdx === null || draggedSnippetIdx === targetIdx) return;
+        const [moved] = snippets.splice(draggedSnippetIdx, 1);
+        snippets.splice(targetIdx, 0, moved);
         saveSnippets();
         renderSnippets();
       });
