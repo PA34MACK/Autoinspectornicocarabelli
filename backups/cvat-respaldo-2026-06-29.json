@@ -1,5 +1,5 @@
 {
-  "exportedAt": "2026-06-29T00:31:52.788Z",
+  "exportedAt": "2026-06-29T18:30:07.746Z",
   "jobs": [
     {
       "id": "22",
@@ -171,11 +171,11 @@
       "role": "reviewer",
       "dateStart": "-",
       "dateCompleted": null,
-      "firstCount": 1,
+      "firstCount": 0,
       "correctionCount": 0,
       "cycles": 0,
       "lastType": "issue",
-      "issueCount": 0
+      "issueCount": 1
     },
     {
       "id": "141",
@@ -194,32 +194,32 @@
       "payId": null,
       "revisionFrames": null,
       "dateRevision": null,
-      "firstCount": 1,
+      "firstCount": 0,
       "correctionCount": 0,
       "cycles": 3,
-      "issueCount": 0
+      "issueCount": 1
     },
     {
-      "id": "151",
+      "id": "150",
       "stars": 3,
-      "hs": 2.25,
+      "hs": 3,
       "status": "complete",
       "pay": "waiting",
       "payDate": "-",
       "dateStart": "27/6/26",
       "dateFinish": "27/6/26",
       "dateCompleted": "27/6/26",
-      "frames": 90,
+      "frames": 200,
       "stage": "complete",
       "role": "reviewer",
       "lastType": "issue",
       "payId": null,
       "revisionFrames": null,
       "dateRevision": null,
-      "firstCount": 1,
+      "firstCount": 0,
       "correctionCount": 0,
       "cycles": 3,
-      "issueCount": 0
+      "issueCount": 1
     },
     {
       "id": "150",
@@ -238,10 +238,10 @@
       "payId": null,
       "revisionFrames": null,
       "dateRevision": null,
-      "firstCount": 3,
+      "firstCount": 0,
       "correctionCount": 0,
       "cycles": 0,
-      "issueCount": 0
+      "issueCount": 1
     }
   ],
   "rates": {
