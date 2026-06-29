@@ -23,12 +23,16 @@
     --warning-text: #633806;
     --magenta-bg: #F5C9E3;
     --magenta-text: #7A1158;
+    --magenta-accent: #C2348C;
     --maroon-bg: #E3B3B0;
     --maroon-text: #5C1212;
+    --maroon-accent: #A8453E;
     --pay-bg: #D7F0DC;
     --pay-text: #0E6B2E;
     --owes-bg: #FBDADA;
     --owes-text: #B3261E;
+    --issue-bg: #E8E0FA;
+    --issue-text: #5B2A9E;
     --radius-md: 8px;
     --radius-lg: 12px;
     --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -52,12 +56,16 @@
       --warning-text: #FAC775;
       --magenta-bg: #6E1A52;
       --magenta-text: #F6BEE2;
+      --magenta-accent: #E368B8;
       --maroon-bg: #5C1010;
       --maroon-text: #F3B8B8;
+      --maroon-accent: #D97A6E;
       --pay-bg: #0E6B2E;
       --pay-text: #B7E8C4;
       --owes-bg: #6B1A16;
       --owes-text: #F7B8B5;
+      --issue-bg: #3A2566;
+      --issue-text: #D8C8F5;
     }
   }
   *{ box-sizing: border-box; }
@@ -79,8 +87,13 @@
   .panel{ display:none; }
   .panel.active{ display:block; }
 
-  .stat-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); gap:12px; margin-bottom:24px; }
-  .stat-card{ background:var(--surface-2); border-radius:var(--radius-md); padding:16px; }
+  .stat-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:12px; margin-bottom:24px; }
+  .stat-card{
+    background:var(--surface-2); border-radius:16px; padding:16px 20px;
+  }
+  .stat-card-lebelling .stat-label, .stat-card-lebelling .stat-value{ color:var(--magenta-text); }
+  .stat-card-reviewer .stat-label, .stat-card-reviewer .stat-value{ color:var(--maroon-text); }
+  .stat-card-owes .stat-label, .stat-card-owes .stat-value{ color:var(--owes-text); }
 
   .jobs-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
   .jobs-header-title{ font-size:16px; font-weight:500; margin:0; }
@@ -108,9 +121,6 @@
   .filter-clear-btn:hover{ color:var(--text-primary); }
   .stat-label{ font-size:13px; color:var(--text-secondary); margin:0 0 4px; }
   .stat-value{ font-size:24px; font-weight:500; margin:0; }
-  .stat-breakdown{ font-size:12px; color:var(--text-tertiary); margin:4px 0 0; }
-  .stat-breakdown .sb-lebelling{ color:var(--magenta-text); font-weight:600; }
-  .stat-breakdown .sb-reviewer{ color:var(--maroon-text); font-weight:600; }
 
   .jobs-list{ display:flex; flex-direction:column; gap:10px; }
   .job-card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:14px 16px; }
@@ -122,6 +132,8 @@
   .badge-warning{ background:var(--warning-bg); color:var(--warning-text); }
   .badge-pay{ background:var(--pay-bg); color:var(--pay-text); font-weight:600; }
   .badge-owes{ background:var(--owes-bg); color:var(--owes-text); font-weight:600; }
+  .badge-stage-inprocess{ background:var(--warning-bg); color:var(--warning-text); font-weight:600; }
+  .badge-stage-complete{ background:var(--pay-bg); color:var(--pay-text); font-weight:600; }
   .job-actions{ display:flex; align-items:center; gap:2px; flex-shrink:0; }
   .icon-btn{ border:none; background:none; padding:4px 6px; color:var(--text-tertiary); cursor:pointer; font-size:16px; display:flex; align-items:center; gap:4px; }
   .icon-btn:hover{ color:var(--text-primary); }
@@ -164,11 +176,6 @@
   .timer-phase{ font-size:13px; color:var(--text-secondary); margin-bottom:4px; }
   .timer-display{ font-size:56px; font-weight:500; font-family:var(--font-mono); margin-bottom:24px; }
   .timer-controls{ display:flex; gap:8px; margin-bottom:24px; }
-  .cycle-dots{ display:flex; gap:6px; flex-wrap:wrap; justify-content:center; max-width:400px; }
-  .cycle-dot{ width:10px; height:10px; border-radius:50%; border:1px solid var(--border-strong); }
-  .cycle-dot.filled{ background:#27500A; border-color:#27500A; }
-  @media (prefers-color-scheme: dark){ .cycle-dot.filled{ background:#C0DD97; border-color:#C0DD97; } }
-  .cycle-label{ font-size:13px; color:var(--text-secondary); margin-top:10px; }
 
   .footer-note{ font-size:12px; color:var(--text-tertiary); margin-top:32px; text-align:center; }
 
@@ -181,6 +188,7 @@
   .pill-role-reviewer{ background:var(--maroon-bg); color:var(--maroon-text); }
   .pill-type-first{ background:var(--info-bg); color:var(--info-text); }
   .pill-type-correction{ background:var(--warning-bg); color:var(--warning-text); }
+  .pill-type-issue{ background:var(--issue-bg); color:var(--issue-text); }
 
   .backup-section{ margin-top:28px; padding-top:18px; border-top:1px solid var(--border); }
   .backup-title{ font-size:13px; color:var(--text-secondary); margin:0 0 10px; }
@@ -191,6 +199,34 @@
   .modal-overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.45); display:flex; align-items:center; justify-content:center; padding:20px; z-index:50; }
   .modal-overlay.hidden{ display:none; }
   .modal-box{ background:var(--surface); border-radius:var(--radius-lg); padding:20px; max-width:420px; width:100%; max-height:88vh; overflow-y:auto; }
+
+  .pdf-modal-box{ max-width:620px; }
+  .pdf-modal-header{ display:flex; align-items:center; justify-content:space-between; }
+  .pdf-modal-subtitle{ font-size:13px; color:var(--text-tertiary); margin:4px 0 14px; }
+  .pdf-filter-group{ margin-bottom:10px; }
+  .pdf-filter-group-label{ font-size:12px; color:var(--text-tertiary); margin:0 0 6px; text-transform:uppercase; letter-spacing:0.04em; }
+  .pdf-filter-row{ display:flex; gap:8px; margin-bottom:8px; flex-wrap:wrap; }
+  .pdf-filter-pill{ cursor:pointer; border:1.5px solid var(--border-strong); background:var(--surface); transition:background 0.15s ease, color 0.15s ease, border-color 0.15s ease; }
+  .pdf-filter-pill-all.active{ background:var(--surface-2); color:var(--text-primary); border-color:var(--text-tertiary); }
+  .pdf-filter-pill.pill-pay.active{ background:var(--pay-bg); color:var(--pay-text); border-color:var(--pay-text); }
+  .pdf-filter-pill.pill-owes.active{ background:var(--owes-bg); color:var(--owes-text); border-color:var(--owes-text); }
+  .pdf-filter-pill.pill-role-lebelling.active{ background:var(--magenta-bg); color:var(--magenta-text); border-color:var(--magenta-text); }
+  .pdf-filter-pill.pill-role-reviewer.active{ background:var(--maroon-bg); color:var(--maroon-text); border-color:var(--maroon-text); }
+  .pdf-select-row{ display:flex; align-items:center; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
+  .pdf-select-link{ border:none; background:none; color:var(--info-text); font-size:13px; cursor:pointer; text-decoration:underline; padding:0; }
+  .pdf-select-link:hover{ opacity:0.8; }
+  .pdf-select-sep{ color:var(--text-tertiary); }
+  .pdf-select-count{ font-size:12px; color:var(--text-tertiary); margin-left:auto; }
+  .pdf-jobs-list{ display:flex; flex-direction:column; gap:8px; max-height:50vh; overflow-y:auto; margin-bottom:8px; padding-right:2px; }
+  .pdf-job-row{ display:flex; align-items:flex-start; gap:10px; background:var(--surface-2); border-radius:var(--radius-md); padding:10px 12px; }
+  .pdf-job-checkbox{ margin-top:3px; flex-shrink:0; width:16px; height:16px; cursor:pointer; accent-color:var(--info-text); }
+  .pdf-job-info{ flex:1; min-width:0; cursor:pointer; }
+  .pdf-job-info-top{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:13px; }
+  .pdf-job-info-top strong{ font-weight:600; }
+  .pdf-job-info-meta{ font-size:12px; color:var(--text-tertiary); margin-top:2px; }
+  .pdf-generating-msg{ font-size:13px; color:var(--text-tertiary); text-align:center; margin:10px 0 0; }
+
+  .pdf-render-area{ position:fixed; left:0; top:0; width:760px; background:var(--bg); z-index:-9999; }
   .modal-title{ font-size:16px; font-weight:500; margin:0 0 16px; }
   .modal-actions{ display:flex; gap:8px; margin-top:18px; }
   .modal-actions .action-btn{ flex:1; }
@@ -287,14 +323,31 @@
 
   .pay-breakdown-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:18px; }
   @media (max-width:480px){ .pay-breakdown-grid{ grid-template-columns:1fr; } }
-  .pay-breakdown-card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:16px; border-left:4px solid transparent; }
-  .pay-breakdown-lebelling{ border-left-color:var(--magenta-text); }
-  .pay-breakdown-reviewer{ border-left-color:var(--maroon-text); }
+  .pay-breakdown-card{ background:var(--surface-2); border-radius:16px; padding:16px 20px; }
+  .pay-breakdown-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
   .pay-breakdown-role{ font-size:13px; font-weight:600; margin:0 0 2px; }
-  .pay-breakdown-lebelling .pay-breakdown-role{ color:var(--magenta-text); }
-  .pay-breakdown-reviewer .pay-breakdown-role{ color:var(--maroon-text); }
+  .pay-breakdown-lebelling .pay-breakdown-role,
+  .pay-breakdown-lebelling .pay-breakdown-amount{ color:var(--magenta-text); }
+  .pay-breakdown-reviewer .pay-breakdown-role,
+  .pay-breakdown-reviewer .pay-breakdown-amount{ color:var(--maroon-text); }
+  .rate-edit-btn{ font-size:15px; padding:2px; margin-top:-2px; }
   .pay-breakdown-rate{ font-size:12px; color:var(--text-tertiary); margin:0 0 10px; }
-  .pay-breakdown-amount{ font-size:26px; font-weight:600; margin:0; color:var(--text-primary); }
+  .pay-breakdown-amount{ font-size:26px; font-weight:600; margin:0; }
+
+  .currency-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:18px; }
+  @media (max-width:480px){ .currency-grid{ grid-template-columns:1fr; } }
+  .currency-card{ border-radius:16px; padding:16px 20px; position:relative; overflow:hidden; }
+  .currency-card-usd{ background:linear-gradient(135deg, #E3F5E6, #FFFFFF); border:1px solid #C5E8CC; }
+  .currency-card-ars{ background:linear-gradient(135deg, #EAF6FC, #FFFFFF); border:1px solid #CFE9F5; }
+  @media (prefers-color-scheme: dark){
+    .currency-card-usd{ background:linear-gradient(135deg, #163320, #1E2E22); border:1px solid #2C5A3B; }
+    .currency-card-ars{ background:linear-gradient(135deg, #143241, #1E2A30); border:1px solid #2C4A5B; }
+  }
+  .currency-flag-inline{ font-size:15px; margin-right:4px; }
+  .currency-card-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+  .currency-label{ font-size:13px; color:var(--text-secondary); margin:0 0 6px; font-weight:500; display:flex; align-items:center; }
+  .currency-value{ font-size:26px; font-weight:600; margin:0; color:var(--text-primary); }
+  .currency-fx-rate{ font-size:12px; color:var(--text-tertiary); margin:6px 0 0; }
   .pay-breakdown-detail{ font-size:12px; color:var(--text-tertiary); margin:6px 0 0; }
 
   .pay-note{ font-size:12px; color:var(--text-tertiary); display:flex; gap:6px; align-items:flex-start; margin:0 0 24px; line-height:1.5; }
@@ -352,20 +405,27 @@
     </div>
 
     <div class="stat-grid">
-      <div class="stat-card">
+      <div class="stat-card stat-card-neutral">
         <p class="stat-label">Trabajos activos</p>
         <p class="stat-value" id="stat-total">-</p>
       </div>
-      <div class="stat-card">
-        <p class="stat-label">Frames en pack</p>
-        <p class="stat-value" id="stat-frames">-</p>
-        <p class="stat-breakdown" id="stat-frames-breakdown">-</p>
+      <div class="stat-card stat-card-lebelling">
+        <p class="stat-label">Frames Lebelling</p>
+        <p class="stat-value" id="stat-frames-lebelling">-</p>
       </div>
-      <div class="stat-card">
+      <div class="stat-card stat-card-reviewer">
+        <p class="stat-label">Frames Reviewer</p>
+        <p class="stat-value" id="stat-frames-reviewer">-</p>
+      </div>
+      <div class="stat-card stat-card-neutral">
+        <p class="stat-label">Frames totales</p>
+        <p class="stat-value" id="stat-frames">-</p>
+      </div>
+      <div class="stat-card stat-card-owes">
         <p class="stat-label">Owes</p>
         <p class="stat-value" id="stat-pending">-</p>
       </div>
-      <div class="stat-card">
+      <div class="stat-card stat-card-neutral">
         <p class="stat-label">Horas totales</p>
         <p class="stat-value" id="stat-hours">-</p>
       </div>
@@ -386,7 +446,8 @@
         <div>
           <label class="field-label">Tipo de tarea</label>
           <select id="timer-type">
-            <option value="first">Firts annotation</option>
+            <option value="first">Etiquetado de pack</option>
+            <option value="issue">Etiquetado de issue</option>
             <option value="correction">Corrección</option>
           </select>
         </div>
@@ -404,9 +465,6 @@
       <div class="timer-finish-row">
         <button type="button" class="action-btn success" id="timer-finish"><i class="ti ti-check"></i><span>Finish</span></button>
       </div>
-
-      <div class="cycle-dots" id="cycle-dots" style="margin-top:24px;"></div>
-      <p class="cycle-label" id="cycle-count-label">Elegí un trabajo para ver sus ciclos</p>
     </div>
 
     <div class="slide-section" id="snippets-section">
@@ -458,6 +516,47 @@
     </div>
   </div>
 
+  <div id="pdf-modal" class="modal-overlay hidden">
+    <div class="modal-box pdf-modal-box">
+      <div class="pdf-modal-header">
+        <p class="modal-title" style="margin:0;">Exportar a PDF</p>
+        <button type="button" class="icon-btn" id="pdf-modal-close-btn" title="Cerrar"><i class="ti ti-x"></i><span class="icon-fallback">✕</span></button>
+      </div>
+      <p class="pdf-modal-subtitle">Tildá los trabajos que querés incluir en el PDF.</p>
+      <div class="pdf-filter-group">
+        <p class="pdf-filter-group-label">Estado</p>
+        <div class="pdf-filter-row">
+          <button type="button" class="pill pdf-filter-pill pdf-filter-pill-all active" data-pdffiltergroup="pay" data-pdffilter="all">Todos</button>
+          <button type="button" class="pill pdf-filter-pill pill-pay" data-pdffiltergroup="pay" data-pdffilter="pay">Pay</button>
+          <button type="button" class="pill pdf-filter-pill pill-owes" data-pdffiltergroup="pay" data-pdffilter="owes">Owes</button>
+        </div>
+      </div>
+      <div class="pdf-filter-group">
+        <p class="pdf-filter-group-label">Rol</p>
+        <div class="pdf-filter-row">
+          <button type="button" class="pill pdf-filter-pill pdf-filter-pill-all active" data-pdffiltergroup="role" data-pdffilter="all">Todos</button>
+          <button type="button" class="pill pdf-filter-pill pill-role-lebelling" data-pdffiltergroup="role" data-pdffilter="lebelling">Lebelling</button>
+          <button type="button" class="pill pdf-filter-pill pill-role-reviewer" data-pdffiltergroup="role" data-pdffilter="reviewer">Reviewer</button>
+        </div>
+      </div>
+      <div class="pdf-select-row">
+        <button type="button" class="pdf-select-link" id="pdf-select-all-btn">Seleccionar todo</button>
+        <span class="pdf-select-sep">·</span>
+        <button type="button" class="pdf-select-link" id="pdf-select-none-btn">Ninguno</button>
+        <span class="pdf-select-count" id="pdf-select-count">0 seleccionados</span>
+      </div>
+      <div id="pdf-jobs-list" class="pdf-jobs-list"></div>
+      <div class="modal-actions">
+        <button type="button" class="action-btn" id="pdf-cancel-btn">Cancelar</button>
+        <button type="button" class="action-btn primary" id="pdf-generate-btn"><i class="ti ti-file-type-pdf"></i><span class="icon-fallback">📄</span><span>Generar PDF</span></button>
+      </div>
+      <p id="pdf-generating-msg" class="pdf-generating-msg" style="display:none;">Generando PDF…</p>
+    </div>
+  </div>
+
+  <!-- Contenedor oculto donde se renderiza el contenido a capturar para el PDF -->
+  <div id="pdf-render-area" class="pdf-render-area"></div>
+
   <div id="panel-payments" class="panel">
     <div class="payments-hero">
       <p class="payments-hero-label">Total a cobrar (Owes · completados)</p>
@@ -467,16 +566,65 @@
 
     <div class="pay-breakdown-grid">
       <div class="pay-breakdown-card pay-breakdown-lebelling">
-        <p class="pay-breakdown-role">Lebelling</p>
-        <p class="pay-breakdown-rate">USD 0.80 / frame</p>
+        <div class="pay-breakdown-head">
+          <p class="pay-breakdown-role">Lebelling</p>
+          <button type="button" class="icon-btn rate-edit-btn" id="rate-edit-lebelling" title="Editar tarifa"><i class="ti ti-pencil"></i><span class="icon-fallback">✎</span></button>
+        </div>
+        <p class="pay-breakdown-rate" id="pay-lebelling-rate">USD 0.80 / frame</p>
         <p class="pay-breakdown-amount" id="pay-lebelling-usd">USD 0.00</p>
         <p class="pay-breakdown-detail" id="pay-lebelling-detail">0 frames · 0 packs</p>
       </div>
       <div class="pay-breakdown-card pay-breakdown-reviewer">
-        <p class="pay-breakdown-role">Reviewer</p>
-        <p class="pay-breakdown-rate">USD 0.40 / frame</p>
+        <div class="pay-breakdown-head">
+          <p class="pay-breakdown-role">Reviewer</p>
+          <button type="button" class="icon-btn rate-edit-btn" id="rate-edit-reviewer" title="Editar tarifa"><i class="ti ti-pencil"></i><span class="icon-fallback">✎</span></button>
+        </div>
+        <p class="pay-breakdown-rate" id="pay-reviewer-rate">USD 0.40 / frame</p>
         <p class="pay-breakdown-amount" id="pay-reviewer-usd">USD 0.00</p>
         <p class="pay-breakdown-detail" id="pay-reviewer-detail">0 frames · 0 packs</p>
+      </div>
+    </div>
+
+    <div class="currency-grid">
+      <div class="currency-card currency-card-usd">
+        <p class="currency-label"><span class="currency-flag-inline">🇺🇸</span> Total en dólares</p>
+        <p class="currency-value" id="currency-usd-value">USD 0.00</p>
+      </div>
+      <div class="currency-card currency-card-ars">
+        <div class="currency-card-head">
+          <p class="currency-label"><span class="currency-flag-inline">🇦🇷</span> Total en pesos</p>
+          <button type="button" class="icon-btn rate-edit-btn" id="fx-edit-btn" title="Editar tipo de cambio"><i class="ti ti-pencil"></i><span class="icon-fallback">✎</span></button>
+        </div>
+        <p class="currency-value" id="currency-ars-value">$ 0</p>
+        <p class="currency-fx-rate" id="currency-fx-rate">1 USD = $ 1.490</p>
+      </div>
+    </div>
+
+    <div id="fx-modal" class="modal-overlay hidden">
+      <div class="modal-box">
+        <p class="modal-title">Editar tipo de cambio</p>
+        <div class="field-group">
+          <label class="field-label">Pesos por dólar (ARS)</label>
+          <input type="number" id="fx-input" step="1" min="0">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="action-btn" id="fx-cancel-btn">Cancelar</button>
+          <button type="button" class="action-btn primary" id="fx-save-btn">Guardar</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="rate-modal" class="modal-overlay hidden">
+      <div class="modal-box">
+        <p class="modal-title" id="rate-modal-title">Editar tarifa</p>
+        <div class="field-group">
+          <label class="field-label">USD por frame</label>
+          <input type="number" id="rate-input" step="0.01" min="0">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="action-btn" id="rate-cancel-btn">Cancelar</button>
+          <button type="button" class="action-btn primary" id="rate-save-btn">Guardar</button>
+        </div>
       </div>
     </div>
 
@@ -512,6 +660,8 @@
           <option value="annotation">Annotation</option>
           <option value="validation">Validation</option>
           <option value="acceptance">Acceptance</option>
+          <option value="inprocess">In process</option>
+          <option value="complete">Complete</option>
         </select>
       </div>
       <div>
@@ -531,6 +681,9 @@
       <button type="button" class="action-btn" id="export-btn"><i class="ti ti-download"></i><span>Exportar respaldo (.json)</span></button>
       <button type="button" class="action-btn" id="import-btn"><i class="ti ti-upload"></i><span>Importar respaldo (.json)</span></button>
       <input type="file" id="import-file" accept="application/json" style="display:none;">
+    </div>
+    <div class="backup-row" style="margin-top:8px;">
+      <button type="button" class="action-btn" id="export-pdf-btn"><i class="ti ti-file-type-pdf"></i><span class="icon-fallback">📄</span><span>Exportar PDF</span></button>
     </div>
     <p id="backup-feedback" class="backup-feedback">Listo.</p>
   </div>
@@ -564,7 +717,8 @@
       <div>
         <label class="field-label">Tipo</label>
         <select id="edit-type">
-          <option value="first">Firts annotation</option>
+          <option value="first">Etiquetado de pack</option>
+          <option value="issue">Etiquetado de issue</option>
           <option value="correction">Corrección</option>
         </select>
       </div>
@@ -576,6 +730,8 @@
           <option value="annotation">Annotation</option>
           <option value="validation">Validation</option>
           <option value="acceptance">Acceptance</option>
+          <option value="inprocess">In process</option>
+          <option value="complete">Complete</option>
         </select>
       </div>
       <div>
@@ -598,17 +754,17 @@
     </div>
     <div class="field-row field-group">
       <div>
-        <label class="field-label">Firts annotation (cant.)</label>
+        <label class="field-label">Etiquetado de pack (cant.)</label>
         <input type="number" id="edit-firstcount" min="0">
       </div>
       <div>
-        <label class="field-label">Correcciones (cant.)</label>
-        <input type="number" id="edit-correctioncount" min="0">
+        <label class="field-label">Etiquetado de issue (cant.)</label>
+        <input type="number" id="edit-issuecount" min="0">
       </div>
     </div>
     <div class="field-group">
-      <label class="field-label">Ciclos de cronómetro</label>
-      <input type="number" id="edit-cycles" min="0">
+      <label class="field-label">Correcciones (cant.)</label>
+      <input type="number" id="edit-correctioncount" min="0">
     </div>
     <div class="field-group">
       <label class="field-label">Fecha de entrega</label>
@@ -628,18 +784,19 @@
   let jobs = [];
 
   const seedJobs = [
-    {id:'22', stars:0, hs:6, status:'complete', pay:'complete', payDate:'21/5/26', dateStart:'-', dateFinish:'12/5/26', dateCompleted:'12/5/26', frames:200, stage:'acceptance', role:'lebelling', payId:'00000036', revisionFrames:null, dateRevision:null, firstCount:1, correctionCount:0},
-    {id:'21', stars:0, hs:6, status:'complete', pay:'waiting', payDate:'-', dateStart:'-', dateFinish:'26/5/26', dateCompleted:null, frames:200, stage:'acceptance', role:'lebelling', payId:null, revisionFrames:null, dateRevision:null, firstCount:1, correctionCount:0},
-    {id:'73', stars:6, hs:4.5, status:'complete', pay:'waiting', payDate:'-', dateStart:'-', dateFinish:'04/6/26', dateCompleted:null, frames:200, stage:'validation', role:'lebelling', payId:null, revisionFrames:null, dateRevision:null, firstCount:1, correctionCount:0},
-    {id:'142', stars:7, hs:5.5, status:'complete', pay:'waiting', payDate:'-', dateStart:'-', dateFinish:'10/6/26', dateCompleted:null, frames:200, stage:'annotation', role:'lebelling', payId:null, revisionFrames:129, dateRevision:'25/6/26', firstCount:1, correctionCount:1},
-    {id:'204', stars:1, hs:0.45, status:'complete', pay:'waiting', payDate:'-', dateStart:'-', dateFinish:'15/6/26', dateCompleted:null, frames:23, stage:'annotation', role:'lebelling', payId:null, revisionFrames:null, dateRevision:null, firstCount:1, correctionCount:0},
-    {id:'203', stars:6, hs:4.5, status:'complete', pay:'waiting', payDate:'-', dateStart:'-', dateFinish:'16/6/26', dateCompleted:null, frames:200, stage:'annotation', role:'lebelling', payId:null, revisionFrames:null, dateRevision:null, firstCount:1, correctionCount:0},
-    {id:'199', stars:6, hs:7, status:'complete', pay:'waiting', payDate:'-', dateStart:'-', dateFinish:'23/6/26', dateCompleted:null, frames:200, stage:'annotation', role:'lebelling', payId:null, revisionFrames:null, dateRevision:null, firstCount:1, correctionCount:0},
+    {id:'22', stars:0, hs:6, status:'complete', pay:'complete', payDate:'21/5/26', dateStart:'-', dateFinish:'12/5/26', dateCompleted:'12/5/26', frames:200, stage:'acceptance', role:'lebelling', payId:'00000036', revisionFrames:null, dateRevision:null, firstCount:1, correctionCount:0, issueCount:0},
+    {id:'21', stars:0, hs:6, status:'complete', pay:'waiting', payDate:'-', dateStart:'-', dateFinish:'26/5/26', dateCompleted:null, frames:200, stage:'acceptance', role:'lebelling', payId:null, revisionFrames:null, dateRevision:null, firstCount:1, correctionCount:0, issueCount:0},
+    {id:'73', stars:6, hs:4.5, status:'complete', pay:'waiting', payDate:'-', dateStart:'-', dateFinish:'04/6/26', dateCompleted:null, frames:200, stage:'validation', role:'lebelling', payId:null, revisionFrames:null, dateRevision:null, firstCount:1, correctionCount:0, issueCount:0},
+    {id:'142', stars:7, hs:5.5, status:'complete', pay:'waiting', payDate:'-', dateStart:'-', dateFinish:'10/6/26', dateCompleted:null, frames:200, stage:'annotation', role:'lebelling', payId:null, revisionFrames:129, dateRevision:'25/6/26', firstCount:1, correctionCount:1, issueCount:0},
+    {id:'204', stars:1, hs:0.45, status:'complete', pay:'waiting', payDate:'-', dateStart:'-', dateFinish:'15/6/26', dateCompleted:null, frames:23, stage:'annotation', role:'lebelling', payId:null, revisionFrames:null, dateRevision:null, firstCount:1, correctionCount:0, issueCount:0},
+    {id:'203', stars:6, hs:4.5, status:'complete', pay:'waiting', payDate:'-', dateStart:'-', dateFinish:'16/6/26', dateCompleted:null, frames:200, stage:'annotation', role:'lebelling', payId:null, revisionFrames:null, dateRevision:null, firstCount:1, correctionCount:0, issueCount:0},
+    {id:'199', stars:6, hs:7, status:'complete', pay:'waiting', payDate:'-', dateStart:'-', dateFinish:'23/6/26', dateCompleted:null, frames:200, stage:'annotation', role:'lebelling', payId:null, revisionFrames:null, dateRevision:null, firstCount:1, correctionCount:0, issueCount:0},
   ];
 
-  const stageLabel = { annotation:'Annotation', validation:'Validation', acceptance:'Acceptance' };
+  const stageLabel = { annotation:'Annotation', validation:'Validation', acceptance:'Acceptance', inprocess:'In process', complete:'Complete' };
+  const stageBadgeClass = { inprocess:'badge-stage-inprocess', complete:'badge-stage-complete' };
   const roleLabel = { lebelling:'Lebelling', reviewer:'Reviewer' };
-  const typeLabel = { first:'Firts annotation', correction:'Corrección' };
+  const typeLabel = { first:'Etiquetado de pack', issue:'Etiquetado de issue', correction:'Corrección' };
 
   function checkpointsFor(hs){ return Math.round((hs * 60) / 45); }
 
@@ -654,8 +811,8 @@
     if(j.dateStart === undefined) j.dateStart = '-';
     if(j.dateCompleted === undefined) j.dateCompleted = null;
     if(j.firstCount === undefined) j.firstCount = 1;
+    if(j.issueCount === undefined) j.issueCount = 0;
     if(j.correctionCount === undefined) j.correctionCount = 0;
-    if(j.cycles === undefined) j.cycles = 0;
     return j;
   }
 
@@ -683,6 +840,57 @@
     return true;
   }
 
+  function buildJobCardHtml(j, idx, withActions){
+    const cp = checkpointsFor(Number(j.hs)||0);
+    const done = Math.min(j.stars||0, cp);
+
+    let dots = '';
+    for(let i=0;i<cp;i++){
+      dots += `<span class="dot ${i<done?'filled':''}"></span>`;
+    }
+
+    const payBadgeClass = j.pay === 'complete' ? 'badge-pay' : 'badge-owes';
+    const payLabel = j.pay === 'complete' ? 'Pay' : 'Owes';
+    const revisionLine = j.revisionFrames
+      ? `<div class="revision-line"><i class="ti ti-history"></i> revisión: ${j.revisionFrames} frames · ${j.dateRevision||''}</div>`
+      : '';
+    const completedLine = j.dateCompleted
+      ? `<div class="revision-line"><i class="ti ti-circle-check"></i> completado: ${j.dateCompleted}</div>`
+      : '';
+    const countsLine = `<div class="revision-line"><i class="ti ti-list-numbers"></i> etiquetado de pack: ${j.firstCount||0} · etiquetado de issue: ${j.issueCount||0} · correcciones: ${j.correctionCount||0}</div>`;
+
+    const actionsHtml = withActions ? `
+          <div class="job-actions">
+            <button type="button" class="icon-btn edit-btn" data-idx="${idx}" aria-label="Editar trabajo" title="Editar"><i class="ti ti-pencil"></i><span class="icon-fallback">✎</span></button>
+            <button type="button" class="icon-btn del-btn" data-idx="${idx}" aria-label="Eliminar trabajo" title="Eliminar"><i class="ti ti-trash"></i><span class="icon-fallback">🗑</span></button>
+          </div>` : '';
+
+    return `
+        <div class="job-head">
+          <div>
+            <span class="job-id">Id ${j.id}</span>
+            <span class="badge">${j.frames} frames</span>
+            <span class="badge ${stageBadgeClass[j.stage] || 'badge-info'}">${stageLabel[j.stage]||j.stage}</span>
+          </div>${actionsHtml}
+        </div>
+        <div class="pill-row">
+          <span class="pill pill-role-${j.role==='reviewer'?'reviewer':'lebelling'}">${roleLabel[j.role]||roleLabel.lebelling}</span>
+          <span class="pill pill-type-${j.lastType||'first'}">${typeLabel[j.lastType] || typeLabel.first}</span>
+        </div>
+        <div class="dots-row">
+          <div>${dots}</div>
+          <span style="font-size:12px; color:var(--text-tertiary);">${done}/${cp} checkpoints · ${j.hs} hs</span>
+        </div>
+        <div class="meta-row">
+          <span><i class="ti ti-calendar"></i> entrega ${j.dateFinish}</span>
+          <span class="badge ${payBadgeClass}">${payLabel}${j.payId ? ' · '+j.payId : ''}</span>
+        </div>
+        ${countsLine}
+        ${revisionLine}
+        ${completedLine}
+      `;
+  }
+
   function render(){
     const list = document.getElementById('jobs-list');
     const empty = document.getElementById('empty-state');
@@ -700,8 +908,8 @@
     });
     document.getElementById('stat-total').textContent = jobs.length;
     document.getElementById('stat-frames').textContent = totalFrames.toLocaleString('es-AR');
-    document.getElementById('stat-frames-breakdown').innerHTML =
-      `<span class="sb-lebelling">${framesLebelling.toLocaleString('es-AR')} lebelling</span> · <span class="sb-reviewer">${framesReviewer.toLocaleString('es-AR')} reviewer</span>`;
+    document.getElementById('stat-frames-lebelling').textContent = framesLebelling.toLocaleString('es-AR');
+    document.getElementById('stat-frames-reviewer').textContent = framesReviewer.toLocaleString('es-AR');
     document.getElementById('stat-pending').textContent = pending;
     document.getElementById('stat-hours').textContent = (Math.round(totalHs*100)/100) + ' hs';
 
@@ -711,54 +919,9 @@
 
     jobs.forEach((j, idx) => {
       if(!jobMatchesFilters(j)) return;
-      const cp = checkpointsFor(Number(j.hs)||0);
-      const done = Math.min(j.stars||0, cp);
       const card = document.createElement('div');
       card.className = 'job-card';
-
-      let dots = '';
-      for(let i=0;i<cp;i++){
-        dots += `<span class="dot ${i<done?'filled':''}"></span>`;
-      }
-
-      const payBadgeClass = j.pay === 'complete' ? 'badge-pay' : 'badge-owes';
-      const payLabel = j.pay === 'complete' ? 'Pay' : 'Owes';
-      const revisionLine = j.revisionFrames
-        ? `<div class="revision-line"><i class="ti ti-history"></i> revisión: ${j.revisionFrames} frames · ${j.dateRevision||''}</div>`
-        : '';
-      const completedLine = j.dateCompleted
-        ? `<div class="revision-line"><i class="ti ti-circle-check"></i> completado: ${j.dateCompleted}</div>`
-        : '';
-      const countsLine = `<div class="revision-line"><i class="ti ti-list-numbers"></i> firts: ${j.firstCount||0} · correcciones: ${j.correctionCount||0} · ciclos: ${j.cycles||0}</div>`;
-
-      card.innerHTML = `
-        <div class="job-head">
-          <div>
-            <span class="job-id">Id ${j.id}</span>
-            <span class="badge">${j.frames} frames</span>
-            <span class="badge badge-info">${stageLabel[j.stage]||j.stage}</span>
-          </div>
-          <div class="job-actions">
-            <button type="button" class="icon-btn edit-btn" data-idx="${idx}" aria-label="Editar trabajo" title="Editar"><i class="ti ti-pencil"></i><span class="icon-fallback">✎</span></button>
-            <button type="button" class="icon-btn del-btn" data-idx="${idx}" aria-label="Eliminar trabajo" title="Eliminar"><i class="ti ti-trash"></i><span class="icon-fallback">🗑</span></button>
-          </div>
-        </div>
-        <div class="pill-row">
-          <span class="pill pill-role-${j.role==='reviewer'?'reviewer':'lebelling'}">${roleLabel[j.role]||roleLabel.lebelling}</span>
-          <span class="pill pill-type-${j.lastType==='correction'?'correction':'first'}">${(j.lastType==='correction')?typeLabel.correction:typeLabel.first}</span>
-        </div>
-        <div class="dots-row">
-          <div>${dots}</div>
-          <span style="font-size:12px; color:var(--text-tertiary);">${done}/${cp} checkpoints · ${j.hs} hs</span>
-        </div>
-        <div class="meta-row">
-          <span><i class="ti ti-calendar"></i> entrega ${j.dateFinish}</span>
-          <span class="badge ${payBadgeClass}">${payLabel}${j.payId ? ' · '+j.payId : ''}</span>
-        </div>
-        ${countsLine}
-        ${revisionLine}
-        ${completedLine}
-      `;
+      card.innerHTML = buildJobCardHtml(j, idx, true);
       list.appendChild(card);
     });
 
@@ -800,8 +963,45 @@
   }
 
   // ---- Payments ----
-  const RATE_LEBELLING = 0.80;
-  const RATE_REVIEWER = 0.40;
+  const RATES_KEY = 'cvat-rates-v1';
+  let rates = { lebelling: 0.80, reviewer: 0.40 };
+
+  function loadRates(){
+    try{
+      const raw = localStorage.getItem(RATES_KEY);
+      if(raw){
+        const parsed = JSON.parse(raw);
+        if(typeof parsed.lebelling === 'number') rates.lebelling = parsed.lebelling;
+        if(typeof parsed.reviewer === 'number') rates.reviewer = parsed.reviewer;
+      }
+    }catch(e){}
+  }
+
+  function saveRates(){
+    try{ localStorage.setItem(RATES_KEY, JSON.stringify(rates)); }catch(e){}
+  }
+
+  // ---- Tipo de cambio USD -> ARS ----
+  const FX_KEY = 'cvat-fx-v1';
+  let fxRate = 1490;
+
+  function loadFxRate(){
+    try{
+      const raw = localStorage.getItem(FX_KEY);
+      if(raw){
+        const parsed = JSON.parse(raw);
+        if(typeof parsed.rate === 'number' && parsed.rate > 0) fxRate = parsed.rate;
+      }
+    }catch(e){}
+  }
+
+  function saveFxRate(){
+    try{ localStorage.setItem(FX_KEY, JSON.stringify({ rate: fxRate })); }catch(e){}
+  }
+
+  function formatArs(n){
+    return '$ ' + Math.round(n).toLocaleString('es-AR');
+  }
 
   function formatUsd(n){
     return 'USD ' + n.toLocaleString('en-US', { minimumFractionDigits:2, maximumFractionDigits:2 });
@@ -810,13 +1010,18 @@
   function renderPayments(){
     const totalEl = document.getElementById('pay-total-usd');
     const totalSubEl = document.getElementById('pay-total-frames-sub');
+    const lebRateEl = document.getElementById('pay-lebelling-rate');
     const lebUsdEl = document.getElementById('pay-lebelling-usd');
     const lebDetailEl = document.getElementById('pay-lebelling-detail');
+    const revRateEl = document.getElementById('pay-reviewer-rate');
     const revUsdEl = document.getElementById('pay-reviewer-usd');
     const revDetailEl = document.getElementById('pay-reviewer-detail');
     const detailList = document.getElementById('pay-detail-list');
     const emptyState = document.getElementById('pay-empty-state');
     if(!totalEl) return; // el panel todavia no esta en el DOM (no deberia pasar, pero por seguridad)
+
+    lebRateEl.textContent = `USD ${rates.lebelling.toFixed(2)} / frame`;
+    revRateEl.textContent = `USD ${rates.reviewer.toFixed(2)} / frame`;
 
     const payableJobs = jobs.filter(j => j.status === 'complete' && j.pay === 'waiting');
 
@@ -826,9 +1031,9 @@
     payableJobs.forEach(j => {
       const f = Number(j.frames)||0;
       if(j.role === 'reviewer'){
-        revFrames += f; revPacks++; revUsd += f * RATE_REVIEWER;
+        revFrames += f; revPacks++; revUsd += f * rates.reviewer;
       } else {
-        lebFrames += f; lebPacks++; lebUsd += f * RATE_LEBELLING;
+        lebFrames += f; lebPacks++; lebUsd += f * rates.lebelling;
       }
     });
 
@@ -844,6 +1049,15 @@
     revUsdEl.textContent = formatUsd(revUsd);
     revDetailEl.textContent = `${revFrames.toLocaleString('es-AR')} frames · ${revPacks} pack${revPacks===1?'':'s'}`;
 
+    const currencyUsdEl = document.getElementById('currency-usd-value');
+    const currencyArsEl = document.getElementById('currency-ars-value');
+    const currencyFxRateEl = document.getElementById('currency-fx-rate');
+    if(currencyUsdEl){
+      currencyUsdEl.textContent = formatUsd(totalUsd);
+      currencyArsEl.textContent = formatArs(totalUsd * fxRate);
+      currencyFxRateEl.textContent = `1 USD = ${formatArs(fxRate)}`;
+    }
+
     detailList.innerHTML = '';
     emptyState.style.display = payableJobs.length === 0 ? 'block' : 'none';
 
@@ -852,7 +1066,7 @@
       .sort((a,b) => (Number(b.frames)||0) - (Number(a.frames)||0))
       .forEach(j => {
         const f = Number(j.frames)||0;
-        const rate = j.role === 'reviewer' ? RATE_REVIEWER : RATE_LEBELLING;
+        const rate = j.role === 'reviewer' ? rates.reviewer : rates.lebelling;
         const amount = f * rate;
         const roleLabelText = j.role === 'reviewer' ? 'Reviewer' : 'Lebelling';
         const row = document.createElement('div');
@@ -868,6 +1082,65 @@
         detailList.appendChild(row);
       });
   }
+
+  // ---- Modal de edición de tarifas ----
+  const rateModal = document.getElementById('rate-modal');
+  let editingRateKey = null;
+
+  function openRateModal(key){
+    editingRateKey = key;
+    document.getElementById('rate-modal-title').textContent =
+      key === 'reviewer' ? 'Editar tarifa Reviewer' : 'Editar tarifa Lebelling';
+    document.getElementById('rate-input').value = rates[key].toFixed(2);
+    rateModal.classList.remove('hidden');
+  }
+
+  function closeRateModal(){
+    rateModal.classList.add('hidden');
+    editingRateKey = null;
+  }
+
+  document.getElementById('rate-edit-lebelling').addEventListener('click', () => openRateModal('lebelling'));
+  document.getElementById('rate-edit-reviewer').addEventListener('click', () => openRateModal('reviewer'));
+  document.getElementById('rate-cancel-btn').addEventListener('click', closeRateModal);
+  rateModal.addEventListener('click', (e) => {
+    if(e.target === rateModal) closeRateModal();
+  });
+  document.getElementById('rate-save-btn').addEventListener('click', () => {
+    if(!editingRateKey) return;
+    const val = Number(document.getElementById('rate-input').value);
+    if(isNaN(val) || val < 0) return;
+    rates[editingRateKey] = val;
+    saveRates();
+    renderPayments();
+    closeRateModal();
+  });
+
+  // ---- Modal de edición del tipo de cambio ----
+  const fxModal = document.getElementById('fx-modal');
+
+  function openFxModal(){
+    document.getElementById('fx-input').value = fxRate;
+    fxModal.classList.remove('hidden');
+  }
+
+  function closeFxModal(){
+    fxModal.classList.add('hidden');
+  }
+
+  document.getElementById('fx-edit-btn').addEventListener('click', openFxModal);
+  document.getElementById('fx-cancel-btn').addEventListener('click', closeFxModal);
+  fxModal.addEventListener('click', (e) => {
+    if(e.target === fxModal) closeFxModal();
+  });
+  document.getElementById('fx-save-btn').addEventListener('click', () => {
+    const val = Number(document.getElementById('fx-input').value);
+    if(isNaN(val) || val <= 0) return;
+    fxRate = val;
+    saveFxRate();
+    renderPayments();
+    closeFxModal();
+  });
 
   // ---- Modal de edición ----
   const editModal = document.getElementById('edit-modal');
@@ -902,8 +1175,8 @@
     document.getElementById('edit-stars').value = j.stars || 0;
     document.getElementById('edit-payid').value = j.payId || '';
     document.getElementById('edit-firstcount').value = j.firstCount || 0;
+    document.getElementById('edit-issuecount').value = j.issueCount || 0;
     document.getElementById('edit-correctioncount').value = j.correctionCount || 0;
-    document.getElementById('edit-cycles').value = j.cycles || 0;
     document.getElementById('edit-date').value = toDateInputValue(j.dateFinish);
     editModal.classList.remove('hidden');
   }
@@ -933,8 +1206,8 @@
     j.stars = Number(document.getElementById('edit-stars').value) || 0;
     j.payId = document.getElementById('edit-payid').value.trim() || null;
     j.firstCount = Number(document.getElementById('edit-firstcount').value) || 0;
+    j.issueCount = Number(document.getElementById('edit-issuecount').value) || 0;
     j.correctionCount = Number(document.getElementById('edit-correctioncount').value) || 0;
-    j.cycles = Number(document.getElementById('edit-cycles').value) || 0;
     j.dateFinish = fromDateInputValue(document.getElementById('edit-date').value);
     saveJobs();
     render();
@@ -968,7 +1241,7 @@
       dateStart, dateFinish:'-', dateCompleted:null,
       frames, stage, role, lastType:'first',
       payId:null, revisionFrames:null, dateRevision:null,
-      firstCount:1, correctionCount:0
+      firstCount:1, issueCount:0, correctionCount:0
     });
     saveJobs();
     render();
@@ -985,6 +1258,8 @@
     const payload = {
       exportedAt: new Date().toISOString(),
       jobs: jobs,
+      rates: rates,
+      fxRate: fxRate,
       timer: (function(){
         try{ return JSON.parse(localStorage.getItem(TIMER_KEY) || '{}'); }catch(e){ return {}; }
       })()
@@ -1018,6 +1293,15 @@
         if(!confirm(`Se van a importar ${importedJobs.length} trabajo(s) y se reemplazarán los datos actuales. ¿Continuar?`)) return;
         jobs = importedJobs.map(normalizeJob);
         saveJobs();
+        if(parsed.rates && typeof parsed.rates === 'object'){
+          if(typeof parsed.rates.lebelling === 'number') rates.lebelling = parsed.rates.lebelling;
+          if(typeof parsed.rates.reviewer === 'number') rates.reviewer = parsed.rates.reviewer;
+          saveRates();
+        }
+        if(typeof parsed.fxRate === 'number' && parsed.fxRate > 0){
+          fxRate = parsed.fxRate;
+          saveFxRate();
+        }
         if(parsed.timer){
           try{ localStorage.setItem(TIMER_KEY, JSON.stringify(parsed.timer)); }catch(err){}
           loadTimerState();
@@ -1039,6 +1323,270 @@
     fb.style.display = 'block';
     setTimeout(()=>{ fb.style.display='none'; }, 3000);
   }
+
+  // ---- Exportar a PDF ----
+  let pdfLibsPromise = null;
+  let pdfSelectedIds = new Set();
+
+  function loadScript(src){
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = src;
+      script.onload = resolve;
+      script.onerror = () => reject(new Error('No se pudo cargar ' + src));
+      document.head.appendChild(script);
+    });
+  }
+
+  function loadPdfLibs(){
+    if(pdfLibsPromise) return pdfLibsPromise;
+    pdfLibsPromise = (async () => {
+      if(!window.jspdf){
+        await loadScript('https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js');
+      }
+      if(!window.html2canvas){
+        await loadScript('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js');
+      }
+    })();
+    return pdfLibsPromise;
+  }
+
+  const pdfModal = document.getElementById('pdf-modal');
+
+  let pdfActiveFilters = { pay: 'all', role: 'all' };
+
+  function openPdfModal(){
+    pdfActiveFilters = { pay: 'all', role: 'all' };
+    pdfSelectedIds = new Set(jobs.map(j => j.id)); // todo tildado por defecto
+    setPdfFilterUi();
+    renderPdfJobsList();
+    pdfModal.classList.remove('hidden');
+    loadPdfLibs().catch(() => {
+      showBackupFeedback('No se pudieron cargar las librerías de PDF. Revisá tu conexión.', true);
+    });
+  }
+
+  function closePdfModal(){
+    pdfModal.classList.add('hidden');
+  }
+
+  function setPdfFilterUi(){
+    document.querySelectorAll('.pdf-filter-pill').forEach(btn => {
+      const group = btn.dataset.pdffiltergroup;
+      btn.classList.toggle('active', pdfActiveFilters[group] === btn.dataset.pdffilter);
+    });
+  }
+
+  function jobMatchesPdfFilters(j){
+    if(pdfActiveFilters.pay === 'pay' && j.pay !== 'complete') return false;
+    if(pdfActiveFilters.pay === 'owes' && j.pay !== 'waiting') return false;
+    if(pdfActiveFilters.role === 'lebelling' && j.role === 'reviewer') return false;
+    if(pdfActiveFilters.role === 'reviewer' && j.role !== 'reviewer') return false;
+    return true;
+  }
+
+  function applyPdfFilters(){
+    pdfSelectedIds = new Set(jobs.filter(jobMatchesPdfFilters).map(j => j.id));
+    setPdfFilterUi();
+    renderPdfJobsList();
+  }
+
+  document.querySelectorAll('.pdf-filter-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      pdfActiveFilters[btn.dataset.pdffiltergroup] = btn.dataset.pdffilter;
+      applyPdfFilters();
+    });
+  });
+
+  function updatePdfSelectCount(){
+    document.getElementById('pdf-select-count').textContent =
+      `${pdfSelectedIds.size} seleccionado${pdfSelectedIds.size===1?'':'s'}`;
+  }
+
+  function renderPdfJobsList(){
+    const list = document.getElementById('pdf-jobs-list');
+    list.innerHTML = '';
+    if(jobs.length === 0){
+      list.innerHTML = '<p class="empty-state" style="padding:16px 0;">No hay trabajos cargados para exportar.</p>';
+      updatePdfSelectCount();
+      return;
+    }
+    jobs.forEach(j => {
+      const row = document.createElement('div');
+      row.className = 'pdf-job-row';
+      const payLabel = j.pay === 'complete' ? 'Pay' : 'Owes';
+      const roleText = roleLabel[j.role] || roleLabel.lebelling;
+      row.innerHTML = `
+        <input type="checkbox" class="pdf-job-checkbox" id="pdf-check-${j.id}" ${pdfSelectedIds.has(j.id) ? 'checked' : ''}>
+        <label class="pdf-job-info" for="pdf-check-${j.id}">
+          <div class="pdf-job-info-top"><strong>Id ${j.id}</strong> · ${j.frames} frames · ${roleText} · ${payLabel}</div>
+          <div class="pdf-job-info-meta">${stageLabel[j.stage]||j.stage} · entrega ${j.dateFinish}</div>
+        </label>
+      `;
+      list.appendChild(row);
+      row.querySelector('.pdf-job-checkbox').addEventListener('change', (e) => {
+        if(e.currentTarget.checked) pdfSelectedIds.add(j.id);
+        else pdfSelectedIds.delete(j.id);
+        pdfActiveFilters = { pay: null, role: null };
+        setPdfFilterUi();
+        updatePdfSelectCount();
+      });
+    });
+    updatePdfSelectCount();
+  }
+
+  document.getElementById('export-pdf-btn').addEventListener('click', openPdfModal);
+  document.getElementById('pdf-modal-close-btn').addEventListener('click', closePdfModal);
+  document.getElementById('pdf-cancel-btn').addEventListener('click', closePdfModal);
+  pdfModal.addEventListener('click', (e) => {
+    if(e.target === pdfModal) closePdfModal();
+  });
+  document.getElementById('pdf-select-all-btn').addEventListener('click', () => {
+    pdfSelectedIds = new Set(jobs.map(j => j.id));
+    pdfActiveFilters = { pay: 'all', role: 'all' };
+    setPdfFilterUi();
+    renderPdfJobsList();
+  });
+  document.getElementById('pdf-select-none-btn').addEventListener('click', () => {
+    pdfSelectedIds = new Set();
+    pdfActiveFilters = { pay: null, role: null };
+    setPdfFilterUi();
+    renderPdfJobsList();
+  });
+
+  async function generatePdf(){
+    const selectedJobs = jobs.filter(j => pdfSelectedIds.has(j.id));
+    if(selectedJobs.length === 0){
+      showBackupFeedback('Tildá al menos un trabajo para exportar.', true);
+      return;
+    }
+
+    const generateBtn = document.getElementById('pdf-generate-btn');
+    const generatingMsg = document.getElementById('pdf-generating-msg');
+    generateBtn.disabled = true;
+    generatingMsg.style.display = 'block';
+
+    try{
+      await loadPdfLibs();
+
+      let totalFrames = 0, totalHs = 0, framesLebelling = 0, framesReviewer = 0, pendingCount = 0;
+      selectedJobs.forEach(j => {
+        const f = Number(j.frames)||0;
+        totalFrames += f;
+        totalHs += Number(j.hs)||0;
+        if(j.role === 'reviewer') framesReviewer += f; else framesLebelling += f;
+        if(j.pay === 'waiting') pendingCount++;
+      });
+
+      const renderArea = document.getElementById('pdf-render-area');
+      renderArea.innerHTML = `
+        <div style="padding:28px;">
+          <h1 style="margin:0 0 4px;">Cronograma de trabajo</h1>
+          <p class="subtitle" style="margin:0 0 24px;">Reporte exportado el ${todayFormatted()} · ${selectedJobs.length} trabajo${selectedJobs.length===1?'':'s'}</p>
+          <div class="stat-grid">
+            <div class="stat-card stat-card-neutral"><p class="stat-label">Trabajos incluidos</p><p class="stat-value">${selectedJobs.length}</p></div>
+            <div class="stat-card stat-card-lebelling"><p class="stat-label">Frames Lebelling</p><p class="stat-value">${framesLebelling.toLocaleString('es-AR')}</p></div>
+            <div class="stat-card stat-card-reviewer"><p class="stat-label">Frames Reviewer</p><p class="stat-value">${framesReviewer.toLocaleString('es-AR')}</p></div>
+            <div class="stat-card stat-card-owes"><p class="stat-label">Owes</p><p class="stat-value">${pendingCount}</p></div>
+            <div class="stat-card stat-card-neutral"><p class="stat-label">Horas totales</p><p class="stat-value">${Math.round(totalHs*100)/100} hs</p></div>
+          </div>
+          <div class="jobs-list" id="pdf-render-jobs-list"></div>
+        </div>
+      `;
+      const renderList = document.getElementById('pdf-render-jobs-list');
+      selectedJobs.forEach((j, idx) => {
+        const card = document.createElement('div');
+        card.className = 'job-card';
+        card.innerHTML = buildJobCardHtml(j, idx, false);
+        renderList.appendChild(card);
+      });
+
+      // Esperar un frame para que el navegador termine de aplicar estilos antes de capturar
+      await new Promise(r => setTimeout(r, 80));
+
+      // Medimos en píxeles "de pantalla" la posición de cada card y del resumen,
+      // para luego escalarlos al tamaño del canvas (que se captura con scale:2).
+      const areaRect = renderArea.getBoundingClientRect();
+      const summaryEl = renderArea.querySelector('.stat-grid');
+      const cardEls = Array.from(renderArea.querySelectorAll('.job-card'));
+      const captureScale = 2; // mismo valor que el "scale" pasado a html2canvas
+
+      const safeBreakPointsPx = []; // límites superiores de cada card, en px del canvas
+      cardEls.forEach(card => {
+        const r = card.getBoundingClientRect();
+        safeBreakPointsPx.push((r.top - areaRect.top) * captureScale);
+      });
+      const summaryBottomPx = summaryEl
+        ? (summaryEl.getBoundingClientRect().bottom - areaRect.top) * captureScale
+        : 0;
+
+      const canvas = await html2canvas(renderArea, {
+        backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--bg') || '#FAF9F6',
+        scale: captureScale,
+        useCORS: true,
+        width: renderArea.scrollWidth,
+        height: renderArea.scrollHeight,
+        windowWidth: renderArea.scrollWidth,
+        windowHeight: renderArea.scrollHeight
+      });
+
+      const { jsPDF } = window.jspdf;
+
+      // Paginamos el canvas capturado, pero ajustando cada salto de página para que
+      // caiga justo antes del inicio de una card (nunca en medio de su contenido).
+      const a4 = { width: 595.28, height: 841.89 }; // puntos
+      const scaleFactor = a4.width / canvas.width;
+      const maxPageHeightPx = a4.height / scaleFactor;
+
+      function nextBreakPoint(currentY){
+        // Buscamos el límite de card más grande que no exceda currentY + maxPageHeightPx
+        const limit = currentY + maxPageHeightPx;
+        let chosen = Math.min(limit, canvas.height);
+        // Candidatos: inicio de cada card que esté estrictamente después de currentY
+        const candidates = safeBreakPointsPx.filter(p => p > currentY + 1 && p <= limit);
+        if(candidates.length > 0){
+          chosen = candidates[candidates.length - 1];
+        }
+        // Si el corte elegido es absurdamente chico (ninguna card entera entra), forzamos el límite normal
+        if(chosen <= currentY) chosen = limit;
+        return Math.min(chosen, canvas.height);
+      }
+
+      const finalPdf = new jsPDF({ unit: 'pt', format: 'a4' });
+      let renderedHeight = 0;
+      let firstPage = true;
+
+      while(renderedHeight < canvas.height){
+        const breakY = nextBreakPoint(renderedHeight);
+        const sliceHeight = breakY - renderedHeight;
+        const pageCanvas = document.createElement('canvas');
+        pageCanvas.width = canvas.width;
+        pageCanvas.height = sliceHeight;
+        const ctx = pageCanvas.getContext('2d');
+        ctx.drawImage(canvas, 0, renderedHeight, canvas.width, sliceHeight, 0, 0, canvas.width, sliceHeight);
+        const pageImgData = pageCanvas.toDataURL('image/jpeg', 0.92);
+
+        if(!firstPage) finalPdf.addPage();
+        finalPdf.addImage(pageImgData, 'JPEG', 0, 0, a4.width, sliceHeight * scaleFactor);
+        firstPage = false;
+        renderedHeight = breakY;
+      }
+
+      const stamp = new Date().toISOString().slice(0,10);
+      finalPdf.save(`cvat-reporte-${stamp}.pdf`);
+
+      renderArea.innerHTML = '';
+      closePdfModal();
+      showBackupFeedback('PDF generado correctamente.');
+    }catch(err){
+      showBackupFeedback('No se pudo generar el PDF. Revisá tu conexión e intentá de nuevo.', true);
+    }finally{
+      generateBtn.disabled = false;
+      generatingMsg.style.display = 'none';
+    }
+  }
+
+  document.getElementById('pdf-generate-btn').addEventListener('click', generatePdf);
 
   // Timer
   const FOCUS_SEC = 45*60;
@@ -1065,25 +1613,6 @@
     toggleBtn.innerHTML = timerState.running
       ? '<i class="ti ti-player-pause"></i><span>Pausar</span>'
       : '<i class="ti ti-player-play"></i><span>Iniciar</span>';
-
-    const job = getSelectedJob();
-    const jobCycles = job ? (job.cycles||0) : 0;
-
-    const dotsWrap = document.getElementById('cycle-dots');
-    dotsWrap.innerHTML = '';
-    const totalDots = Math.max(jobCycles, 4);
-    for(let i=0;i<totalDots;i++){
-      const d = document.createElement('span');
-      d.className = 'cycle-dot' + (i < jobCycles ? ' filled' : '');
-      dotsWrap.appendChild(d);
-    }
-
-    const label = document.getElementById('cycle-count-label');
-    if(job){
-      label.textContent = `Id ${job.id}: ${jobCycles} ${jobCycles===1 ? 'ciclo completado' : 'ciclos completados'}`;
-    } else {
-      label.textContent = 'Elegí un trabajo para ver sus ciclos';
-    }
   }
 
   function saveTimerState(){
@@ -1106,10 +1635,11 @@
     if(!job) return;
     const cp = checkpointsFor(Number(job.hs)||0);
     job.stars = Math.min((job.stars||0) + 1, cp);
-    job.cycles = (job.cycles||0) + 1;
     const taskType = document.getElementById('timer-type').value;
     if(taskType === 'correction'){
       job.correctionCount = (job.correctionCount||0) + 1;
+    } else if(taskType === 'issue'){
+      job.issueCount = (job.issueCount||0) + 1;
     } else {
       job.firstCount = (job.firstCount||0) + 1;
     }
@@ -1511,6 +2041,8 @@
   });
 
   checkIconFontAvailability();
+  loadRates();
+  loadFxRate();
   loadJobs();
   loadTimerState();
   loadSnippets();
