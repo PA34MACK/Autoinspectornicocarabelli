@@ -363,6 +363,15 @@
   .pay-detail-id{ font-weight:500; flex-shrink:0; }
   .pay-detail-meta{ color:var(--text-tertiary); font-size:12px; white-space:nowrap; }
   .pay-detail-amount{ font-weight:600; color:var(--pay-text); flex-shrink:0; }
+
+  .pdf-row-list{ display:flex; flex-direction:column; gap:8px; }
+  .pdf-export-row{
+    display:flex; align-items:center; gap:14px;
+    background:var(--surface-2); border-radius:var(--radius-md); padding:11px 16px; font-size:13px;
+  }
+  .pdf-export-id{ font-weight:600; flex-shrink:0; min-width:64px; }
+  .pdf-export-date{ color:var(--text-tertiary); flex-shrink:0; white-space:nowrap; display:flex; align-items:center; gap:4px; }
+  .pdf-export-frames{ color:var(--text-secondary); flex-shrink:0; white-space:nowrap; margin-left:auto; }
 </style>
 </head>
 <body>
@@ -1469,56 +1478,49 @@
     try{
       await loadPdfLibs();
 
-      let totalFrames = 0, totalHs = 0, framesLebelling = 0, framesReviewer = 0, pendingCount = 0;
-      selectedJobs.forEach(j => {
-        const f = Number(j.frames)||0;
-        totalFrames += f;
-        totalHs += Number(j.hs)||0;
-        if(j.role === 'reviewer') framesReviewer += f; else framesLebelling += f;
-        if(j.pay === 'waiting') pendingCount++;
-      });
-
       const renderArea = document.getElementById('pdf-render-area');
       renderArea.innerHTML = `
         <div style="padding:28px;">
-          <h1 style="margin:0 0 4px;">Cronograma de trabajo</h1>
-          <p class="subtitle" style="margin:0 0 24px;">Reporte exportado el ${todayFormatted()} · ${selectedJobs.length} trabajo${selectedJobs.length===1?'':'s'}</p>
-          <div class="stat-grid">
-            <div class="stat-card stat-card-neutral"><p class="stat-label">Trabajos incluidos</p><p class="stat-value">${selectedJobs.length}</p></div>
-            <div class="stat-card stat-card-lebelling"><p class="stat-label">Frames Lebelling</p><p class="stat-value">${framesLebelling.toLocaleString('es-AR')}</p></div>
-            <div class="stat-card stat-card-reviewer"><p class="stat-label">Frames Reviewer</p><p class="stat-value">${framesReviewer.toLocaleString('es-AR')}</p></div>
-            <div class="stat-card stat-card-owes"><p class="stat-label">Owes</p><p class="stat-value">${pendingCount}</p></div>
-            <div class="stat-card stat-card-neutral"><p class="stat-label">Horas totales</p><p class="stat-value">${Math.round(totalHs*100)/100} hs</p></div>
-          </div>
-          <div class="jobs-list" id="pdf-render-jobs-list"></div>
+          <h1 style="margin:0 0 4px;">Reporte de Id — Carabelli Nicolas</h1>
+          <p class="subtitle" style="margin:0 0 24px;">Exportado el ${todayFormatted()} · ${selectedJobs.length} trabajo${selectedJobs.length===1?'':'s'}</p>
+          <div class="pdf-row-list" id="pdf-render-jobs-list"></div>
         </div>
       `;
       const renderList = document.getElementById('pdf-render-jobs-list');
-      selectedJobs.forEach((j, idx) => {
-        const card = document.createElement('div');
-        card.className = 'job-card';
-        card.innerHTML = buildJobCardHtml(j, idx, false);
-        renderList.appendChild(card);
-      });
+      selectedJobs
+        .slice()
+        .sort((a,b) => String(a.id).localeCompare(String(b.id), undefined, {numeric:true}))
+        .forEach(j => {
+          const roleClass = j.role === 'reviewer' ? 'pill-role-reviewer' : 'pill-role-lebelling';
+          const roleText = roleLabel[j.role] || roleLabel.lebelling;
+          const payClass = j.pay === 'complete' ? 'badge-pay' : 'badge-owes';
+          const payText = j.pay === 'complete' ? 'Pay' : 'Owes';
+          const row = document.createElement('div');
+          row.className = 'pdf-export-row';
+          row.innerHTML = `
+            <span class="pdf-export-id">Id ${j.id}</span>
+            <span class="pdf-export-date"><i class="ti ti-calendar"></i> ${j.dateFinish}</span>
+            <span class="pdf-export-frames">${j.frames} frames</span>
+            <span class="pill ${roleClass}">${roleText}</span>
+            <span class="badge ${payClass}">${payText}</span>
+          `;
+          renderList.appendChild(row);
+        });
 
       // Esperar un frame para que el navegador termine de aplicar estilos antes de capturar
       await new Promise(r => setTimeout(r, 80));
 
-      // Medimos en píxeles "de pantalla" la posición de cada card y del resumen,
+      // Medimos en píxeles "de pantalla" la posición de cada fila,
       // para luego escalarlos al tamaño del canvas (que se captura con scale:2).
       const areaRect = renderArea.getBoundingClientRect();
-      const summaryEl = renderArea.querySelector('.stat-grid');
-      const cardEls = Array.from(renderArea.querySelectorAll('.job-card'));
+      const rowEls = Array.from(renderArea.querySelectorAll('.pdf-export-row'));
       const captureScale = 2; // mismo valor que el "scale" pasado a html2canvas
 
-      const safeBreakPointsPx = []; // límites superiores de cada card, en px del canvas
-      cardEls.forEach(card => {
-        const r = card.getBoundingClientRect();
+      const safeBreakPointsPx = []; // límites superiores de cada fila, en px del canvas
+      rowEls.forEach(row => {
+        const r = row.getBoundingClientRect();
         safeBreakPointsPx.push((r.top - areaRect.top) * captureScale);
       });
-      const summaryBottomPx = summaryEl
-        ? (summaryEl.getBoundingClientRect().bottom - areaRect.top) * captureScale
-        : 0;
 
       const canvas = await html2canvas(renderArea, {
         backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--bg') || '#FAF9F6',
@@ -1533,16 +1535,16 @@
       const { jsPDF } = window.jspdf;
 
       // Paginamos el canvas capturado, pero ajustando cada salto de página para que
-      // caiga justo antes del inicio de una card (nunca en medio de su contenido).
+      // caiga justo antes del inicio de una fila (nunca en medio de su contenido).
       const a4 = { width: 595.28, height: 841.89 }; // puntos
       const scaleFactor = a4.width / canvas.width;
       const maxPageHeightPx = a4.height / scaleFactor;
 
       function nextBreakPoint(currentY){
-        // Buscamos el límite de card más grande que no exceda currentY + maxPageHeightPx
+        // Buscamos el límite de fila más grande que no exceda currentY + maxPageHeightPx
         const limit = currentY + maxPageHeightPx;
         let chosen = Math.min(limit, canvas.height);
-        // Candidatos: inicio de cada card que esté estrictamente después de currentY
+        // Candidatos: inicio de cada fila que esté estrictamente después de currentY
         const candidates = safeBreakPointsPx.filter(p => p > currentY + 1 && p <= limit);
         if(candidates.length > 0){
           chosen = candidates[candidates.length - 1];
