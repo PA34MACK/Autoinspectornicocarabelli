@@ -693,6 +693,7 @@
     </div>
     <div class="backup-row" style="margin-top:8px;">
       <button type="button" class="action-btn" id="export-pdf-btn"><i class="ti ti-file-type-pdf"></i><span class="icon-fallback">📄</span><span>Exportar PDF</span></button>
+      <button type="button" class="action-btn" id="export-html-btn"><i class="ti ti-file-type-html"></i><span class="icon-fallback">🌐</span><span>Exportar HTML</span></button>
     </div>
     <p id="backup-feedback" class="backup-feedback">Listo.</p>
   </div>
@@ -1445,6 +1446,48 @@
   }
 
   document.getElementById('export-pdf-btn').addEventListener('click', openPdfModal);
+
+  document.getElementById('export-html-btn').addEventListener('click', () => {
+    try{
+      const htmlContent = document.documentElement.outerHTML;
+      // Embebemos el estado actual en el HTML exportado reemplazando el array de seed
+      // por los datos reales del localStorage, para que el archivo sea autosuficiente.
+      const dataPayload = {
+        jobs: jobs,
+        rates: rates,
+        fxRate: fxRate,
+        snippets: snippets,
+        feedbacks: feedbacks
+      };
+      const injectedScript = `<script>
+(function(){
+  var d=${JSON.stringify(dataPayload)};
+  try{ localStorage.setItem('cvat-jobs-v1', JSON.stringify(d.jobs)); }catch(e){}
+  try{ localStorage.setItem('cvat-rates-v1', JSON.stringify(d.rates)); }catch(e){}
+  try{ localStorage.setItem('cvat-fx-v1', JSON.stringify({rate:d.fxRate})); }catch(e){}
+  try{ localStorage.setItem('cvat-snippets-v1', JSON.stringify(d.snippets)); }catch(e){}
+  try{ localStorage.setItem('cvat-feedbacks-v1', JSON.stringify(d.feedbacks)); }catch(e){}
+})();
+<\/script>`;
+      // Insertamos el script de datos justo antes del cierre del </head>
+      const exportedHtml = htmlContent.replace('</head>', injectedScript + '</head>');
+
+      const blob = new Blob([exportedHtml], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const stamp = new Date().toISOString().slice(0,10);
+      a.href = url;
+      a.download = `cvat-app-${stamp}.html`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showBackupFeedback('HTML exportado correctamente.');
+    }catch(err){
+      showBackupFeedback('Error al exportar el HTML.', true);
+    }
+  });
+
   document.getElementById('pdf-modal-close-btn').addEventListener('click', closePdfModal);
   document.getElementById('pdf-cancel-btn').addEventListener('click', closePdfModal);
   pdfModal.addEventListener('click', (e) => {
