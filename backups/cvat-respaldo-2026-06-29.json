@@ -1,5 +1,5 @@
 {
-  "exportedAt": "2026-06-29T18:30:07.746Z",
+  "exportedAt": "2026-06-29T23:17:59.334Z",
   "jobs": [
     {
       "id": "22",
@@ -201,14 +201,14 @@
     },
     {
       "id": "150",
-      "stars": 3,
+      "stars": 4,
       "hs": 3,
       "status": "complete",
       "pay": "waiting",
       "payDate": "-",
       "dateStart": "27/6/26",
       "dateFinish": "27/6/26",
-      "dateCompleted": "27/6/26",
+      "dateCompleted": "29/6/26",
       "frames": 200,
       "stage": "complete",
       "role": "reviewer",
@@ -219,10 +219,10 @@
       "firstCount": 0,
       "correctionCount": 0,
       "cycles": 3,
-      "issueCount": 1
+      "issueCount": 2
     },
     {
-      "id": "150",
+      "id": "153",
       "stars": 2,
       "hs": 4,
       "status": "complete",
@@ -242,6 +242,48 @@
       "correctionCount": 0,
       "cycles": 0,
       "issueCount": 1
+    },
+    {
+      "id": "72",
+      "stars": 0,
+      "hs": 0,
+      "status": "complete",
+      "pay": "waiting",
+      "payDate": "-",
+      "dateStart": "29/6/26",
+      "dateFinish": "-",
+      "dateCompleted": "29/6/26",
+      "frames": 17,
+      "stage": "inprocess",
+      "role": "reviewer",
+      "lastType": "issue",
+      "payId": null,
+      "revisionFrames": null,
+      "dateRevision": null,
+      "firstCount": 1,
+      "issueCount": 0,
+      "correctionCount": 0
+    },
+    {
+      "id": "148",
+      "stars": 0,
+      "hs": 0,
+      "status": "complete",
+      "pay": "waiting",
+      "payDate": "-",
+      "dateStart": "29/6/26",
+      "dateFinish": "29/6/26",
+      "dateCompleted": "29/6/26",
+      "frames": 200,
+      "stage": "complete",
+      "role": "reviewer",
+      "lastType": "issue",
+      "payId": null,
+      "revisionFrames": null,
+      "dateRevision": null,
+      "firstCount": 0,
+      "issueCount": 1,
+      "correctionCount": 0
     }
   ],
   "rates": {
@@ -250,6 +292,6 @@
   },
   "fxRate": 1490,
   "timer": {
-    "cyclesToday": 13
+    "cyclesToday": 16
   }
 }
