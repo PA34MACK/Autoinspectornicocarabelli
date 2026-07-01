@@ -195,6 +195,8 @@
   .backup-row{ display:flex; gap:8px; flex-wrap:wrap; }
   .backup-row .action-btn{ flex:1; min-width:160px; }
   .backup-feedback{ font-size:13px; color:var(--success-text); margin:8px 0 0; display:none; }
+  .html-export-toggle{ cursor:pointer; border:1.5px solid var(--border-strong); background:var(--surface); color:var(--text-secondary); transition:background 0.15s ease, color 0.15s ease, border-color 0.15s ease; }
+  .html-export-toggle.active{ background:var(--info-bg); color:var(--info-text); border-color:var(--info-text); }
 
   .modal-overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.45); display:flex; align-items:center; justify-content:center; padding:20px; z-index:50; }
   .modal-overlay.hidden{ display:none; }
@@ -382,8 +384,8 @@
   <div class="tabs">
     <button type="button" class="tab-btn active" data-tab="trabajos">Trabajos</button>
     <button type="button" class="tab-btn" data-tab="timer">Cronómetro</button>
-    <button type="button" class="tab-btn" data-tab="payments">Payments</button>
     <button type="button" class="tab-btn" data-tab="nuevo">Agregar</button>
+    <!-- PAYMENTS_TAB_START --><button type="button" class="tab-btn" data-tab="payments">Payments</button><!-- PAYMENTS_TAB_END -->
   </div>
 
   <div id="panel-trabajos" class="panel active">
@@ -566,7 +568,7 @@
   <!-- Contenedor oculto donde se renderiza el contenido a capturar para el PDF -->
   <div id="pdf-render-area" class="pdf-render-area"></div>
 
-  <div id="panel-payments" class="panel">
+  <!-- PAYMENTS_PANEL_START --><div id="panel-payments" class="panel">
     <div class="payments-hero">
       <p class="payments-hero-label">Total a cobrar (Owes · completados)</p>
       <p class="payments-hero-value" id="pay-total-usd">USD 0.00</p>
@@ -642,7 +644,7 @@
     <h3 class="pay-detail-title">Detalle de packs a cobrar</h3>
     <div id="pay-detail-list" class="pay-detail-list"></div>
     <p id="pay-empty-state" class="empty-state" style="display:none;">No hay trabajos completados pendientes de cobro en este momento.</p>
-  </div>
+  </div><!-- PAYMENTS_PANEL_END -->
 
   <div id="panel-nuevo" class="panel">
     <div class="field-group">
@@ -694,6 +696,10 @@
     <div class="backup-row" style="margin-top:8px;">
       <button type="button" class="action-btn" id="export-pdf-btn"><i class="ti ti-file-type-pdf"></i><span class="icon-fallback">📄</span><span>Exportar PDF</span></button>
       <button type="button" class="action-btn" id="export-html-btn"><i class="ti ti-file-type-html"></i><span class="icon-fallback">🌐</span><span>Exportar HTML</span></button>
+    </div>
+    <div class="backup-row" style="margin-top:8px; align-items:center; gap:8px;">
+      <span style="font-size:13px; color:var(--text-tertiary);">Incluir en el HTML:</span>
+      <button type="button" class="pill html-export-toggle active" id="html-toggle-payments">Payments</button>
     </div>
     <p id="backup-feedback" class="backup-feedback">Listo.</p>
   </div>
@@ -1447,11 +1453,25 @@
 
   document.getElementById('export-pdf-btn').addEventListener('click', openPdfModal);
 
+  // Toggle de incluir Payments en el export HTML
+  let htmlExportIncludePayments = true;
+  const htmlTogglePayments = document.getElementById('html-toggle-payments');
+  htmlTogglePayments.addEventListener('click', () => {
+    htmlExportIncludePayments = !htmlExportIncludePayments;
+    htmlTogglePayments.classList.toggle('active', htmlExportIncludePayments);
+  });
+
   document.getElementById('export-html-btn').addEventListener('click', () => {
     try{
-      const htmlContent = document.documentElement.outerHTML;
-      // Embebemos el estado actual en el HTML exportado reemplazando el array de seed
-      // por los datos reales del localStorage, para que el archivo sea autosuficiente.
+      let htmlContent = document.documentElement.outerHTML;
+
+      // Si el usuario no quiere Payments, eliminamos el tab y el panel usando los comentarios delimitadores
+      if(!htmlExportIncludePayments){
+        htmlContent = htmlContent
+          .replace(/<!--\s*PAYMENTS_TAB_START\s*-->[\s\S]*?<!--\s*PAYMENTS_TAB_END\s*-->/g, '')
+          .replace(/<!--\s*PAYMENTS_PANEL_START\s*-->[\s\S]*?<!--\s*PAYMENTS_PANEL_END\s*-->/g, '');
+      }
+
       const dataPayload = {
         jobs: jobs,
         rates: rates,
@@ -1469,7 +1489,6 @@
   try{ localStorage.setItem('cvat-feedbacks-v1', JSON.stringify(d.feedbacks)); }catch(e){}
 })();
 <\/script>`;
-      // Insertamos el script de datos justo antes del cierre del </head>
       const exportedHtml = htmlContent.replace('</head>', injectedScript + '</head>');
 
       const blob = new Blob([exportedHtml], { type: 'text/html;charset=utf-8' });
